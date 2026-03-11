@@ -4,56 +4,55 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quiver Mutation Database (QMD)</title>
-  
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-J4QG6T5TE5"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-  
     gtag('config', 'G-J4QG6T5TE5');
   </script>
 
-  <style>
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      max-width: 900px;
-      margin: 48px auto;
-      padding: 0 18px;
-      line-height: 1.6;
-    }
-    nav a {
-      margin-right: 16px;
-      text-decoration: none;
-      color: #0b57d0;
-    }
-    nav {
-      margin-bottom: 32px;
-    }
-  </style>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
 
 <nav>
-  <a href="/">Home</a>
+  <a href="/" class="brand">QMD</a>
+  <a href="/" class="active">Home</a>
   <a href="/about.html">About</a>
+  <a href="/browse.html">Browse</a>
+  <a href="/search.html">Search</a>
   <a href="/roadmap.html">Roadmap</a>
 </nav>
-  
-  <h1>Quiver Mutation Database (QMD)</h1>
-  <div class="tag">Open research infrastructure for quivers, exchange matrices, and mutation-equivalence classes.</div>
 
-  <div class="box">
-    <p><strong>Status:</strong> Under active development.</p>
+<div class="page">
+
+  <h1>Quiver Mutation Database</h1>
+  <p style="font-style:italic; color:var(--ink-light); margin-bottom:2rem;">
+    Open research infrastructure for quivers, exchange matrices, and mutation-equivalence classes.
+  </p>
+
+  <div class="status-box">
+    <p><strong>Status:</strong> <span class="badge badge-dev">Under active development</span></p>
     <p>
-      QMD will provide a home for quiver mutation and related combinatorial data. If you would like more information, 
-      please see the <a href="/about.html">About</a> page.
+      QMD will provide a curated, citable, and reproducible database of quivers and mutation classes,
+      together with rigorously defined invariants and transparent computational provenance.
+      See the <a href="/about.html">About</a> page for more information.
     </p>
   </div>
 
   <p>
     Contact: <a href="mailto:blake.jackson@uconn.edu">blake.jackson@uconn.edu</a>
   </p>
+
+</div>
+
+<footer>
+  <span>Quiver Mutation Database (QMD)</span>
+  <span><a href="mailto:blake.jackson@uconn.edu">blake.jackson@uconn.edu</a></span>
+</footer>
+
 </body>
 </html>
