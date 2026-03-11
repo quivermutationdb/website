@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Quivers — QMD</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J4QG6T5TE5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J4QG6T5TE5');
+  </script>
+
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<nav>
+  <a href="/" class="brand">QMD</a>
+  <a href="/about.html">About</a>
+  <a href="/browse.html" class="active">Browse</a>
+  <a href="/search.html">Search</a>
+  <a href="/roadmap.html">Roadmap</a>
+  <div class="spacer"></div>
+  <span class="status" id="api-status">connecting…</span>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Browse Quivers</h1>
+    <p>All unlabeled quivers in the database, one record per isomorphism class.</p>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Rank (vertices)</label>
+      <select id="filter-rank">
+        <option value="">All ranks</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Class type</label>
+      <select id="filter-open">
+        <option value="">All</option>
+        <option value="false">Finite type (closed)</option>
+        <option value="true">Open (unbounded)</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Dynkin type</label>
+      <input type="text" id="filter-dynkin" placeholder="e.g. A3, D4, E6">
+    </div>
+    <button class="btn" onclick="applyFilters()">Filter</button>
+    <button class="btn btn-ghost" onclick="resetFilters()">Reset</button>
+  </div>
+
+  <div class="stats-row" id="stats-row" style="display:none">
+    <span>Showing <b id="stat-showing">—</b> quivers</span>
+    <span>Page <b id="stat-page">—</b> of <b id="stat-pages">—</b></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="quiver-table">
+      <thead>
+        <tr>
+          <th data-col="qmd_id">Quiver ID <span class="sort-arrow">↕</span></th>
+          <th data-col="num_vertices">Rank <span class="sort-arrow">↕</span></th>
+          <th data-col="dynkin_type">Dynkin type <span class="sort-arrow">↕</span></th>
+          <th data-col="class_type">Class <span class="sort-arrow">↕</span></th>
+          <th data-col="class_size">Orbit size <span class="sort-arrow">↕</span></th>
+          <th>Mutation class</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="6">
+          <div class="state-msg">
+            <div class="spinner"></div>
+            Loading quivers…
+          </div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<script>
+const API = 'https://api.quivermutationdb.org';
+const PAGE_SIZE = 50;
+let currentPage = 1;
+let totalCount = 0;
+let sortCol = 'num_vertices';
+let sortDir = 'asc';
+let filters = {};
+
+async function fetchQuivers(page = 1) {
+  const offset = (page - 1) * PAGE_SIZE;
+  const params = new URLSearchParams({
+    limit: PAGE_SIZE,
+    offset,
+    sort: sortCol,
+    dir: sortDir,
+    ...filters,
+  });
+  // Remove empty params
+  for (const [k, v] of [...params.entries()]) {
+    if (!v) params.delete(k);
+  }
+
+  try {
+    const res = await fetch(`${API}/quivers?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    document.getElementById('api-status').textContent = 'connected';
+    return await res.json();
+  } catch (e) {
+    // Demo mode: generate synthetic data when API isn't live yet
+    return demoData(offset);
+  }
+}
+
+function demoData(offset) {
+  // Synthetic rows so the page is useful before the API is live
+  const types = ['A','D','E','—'];
+  const dynkin = ['A1','A2','A3','A4','D4','D5','E6','E7','E8','—','—','—'];
+  const rows = [];
+  for (let i = 0; i < PAGE_SIZE; i++) {
+    const idx = offset + i;
+    const n = (idx % 4) + 1;
+    const isOpen = idx % 3 === 0;
+    const dyn = dynkin[idx % dynkin.length];
+    rows.push({
+      qmd_id: `Q.n${n}.${(0xdeadbeef + idx * 0x9e3779b9).toString(16).slice(0,16).padEnd(16,'0')}`,
+      num_vertices: n,
+      dynkin_type: isOpen ? null : dyn,
+      is_open: isOpen,
+      class_size: isOpen ? null : [2,14,50,132][n-1],
+      mc_id: `MC.n${n}.${(0xcafebabe + idx * 0x6c62272e).toString(16).slice(0,16).padEnd(16,'0')}`,
+    });
+  }
+  document.getElementById('api-status').textContent = 'demo mode';
+  return { items: rows, total: 724 };
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('table-body');
+  totalCount = data.total;
+
+  if (!data.items || data.items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6">
+      <div class="state-msg">
+        <span class="mono-label">No results</span>
+        No quivers match the current filters.
+      </div>
+    </td></tr>`;
+    document.getElementById('stats-row').style.display = 'none';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = data.items.map(q => `
+    <tr>
+      <td><a href="/quiver.html?id=${encodeURIComponent(q.qmd_id)}">${q.qmd_id}</a></td>
+      <td class="mono">${q.num_vertices}</td>
+      <td class="mono">${q.dynkin_type ?? '<span style="color:var(--rule)">—</span>'}</td>
+      <td>
+        <span class="badge ${q.is_open ? 'badge-open' : 'badge-closed'}">
+          ${q.is_open ? 'Open' : 'Finite'}
+        </span>
+      </td>
+      <td class="mono">${q.class_size ?? '<span style="color:var(--rule)">∞</span>'}</td>
+      <td><a href="/class.html?id=${encodeURIComponent(q.mc_id)}">${q.mc_id}</a></td>
+    </tr>
+  `).join('');
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  document.getElementById('stats-row').style.display = 'flex';
+  document.getElementById('stat-showing').textContent = totalCount.toLocaleString();
+  document.getElementById('stat-page').textContent = currentPage;
+  document.getElementById('stat-pages').textContent = totalPages;
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  const el = document.getElementById('pagination');
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+  const pages = [];
+  pages.push(`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>`);
+
+  const range = [];
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2) range.push(p);
+    else if (range[range.length-1] !== '…') range.push('…');
+  }
+  range.forEach(p => {
+    if (p === '…') pages.push(`<span class="page-info">…</span>`);
+    else pages.push(`<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`);
+  });
+  pages.push(`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>→</button>`);
+  el.innerHTML = pages.join('');
+}
+
+async function goPage(p) {
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  const data = await fetchQuivers(currentPage);
+  renderTable(data);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function applyFilters() {
+  filters = {};
+  const rank = document.getElementById('filter-rank').value;
+  const open = document.getElementById('filter-open').value;
+  const dynkin = document.getElementById('filter-dynkin').value.trim();
+  if (rank)   filters.rank = rank;
+  if (open)   filters.is_open = open;
+  if (dynkin) filters.dynkin_type = dynkin;
+  currentPage = 1;
+  goPage(1);
+}
+
+function resetFilters() {
+  document.getElementById('filter-rank').value = '';
+  document.getElementById('filter-open').value = '';
+  document.getElementById('filter-dynkin').value = '';
+  filters = {};
+  currentPage = 1;
+  goPage(1);
+}
+
+// Sort on column header click
+document.querySelectorAll('th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    else { sortCol = col; sortDir = 'asc'; }
+    document.querySelectorAll('th').forEach(t => t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    th.querySelector('.sort-arrow').textContent = sortDir === 'asc' ? '↑' : '↓';
+    currentPage = 1;
+    goPage(1);
+  });
+});
+
+// Initial load
+(async () => {
+  const data = await fetchQuivers(1);
+  renderTable(data);
+})();
+</script>
+<footer>
+  <span>Quiver Mutation Database (QMD)</span>
+  <span><a href="mailto:blake.jackson@uconn.edu">blake.jackson@uconn.edu</a></span>
+</footer>
+
+</body>
+</html>
