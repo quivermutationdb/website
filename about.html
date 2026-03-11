@@ -64,13 +64,22 @@
   reproducible database of quivers and mutation classes, together with 
   rigorously defined invariants and transparent computational provenance. 
   The project is inspired by successful community resources such as the 
-  <a href="https://www.lmfdb.org/">L-functions and Modular Forms Database (LMFDB)</a>, 
+  <a href="https://www.lmfdb.org/">L-functions and Modular Forms Database (LMFDB)</a> 
+  and <a href="https://houseofgraphs.org/">House of Graphs</a>, 
   and aims to bring similar infrastructure principles to the study of quiver mutation.
   </p>
   
   <h2>Design principles</h2>
   </p>
   QMD is built around the following core principles:
+  </p>
+
+  <p><strong>FAIR: Findable, Accessible, Interoperable, Reusable</strong><br />
+  The QMD will be designed in accordance with the FAIR Data Principles, as articulated 
+  in <a href="https://www.nature.com/articles/sdata201618">this article</a>. A QMD 
+  that is not findable, accessible to non-experts, integratable with other existing
+  mathematical infrastructure, or reusable is of little use to the mathematical community
+  at large. 
   </p>
   
   <p><strong>Stable identifiers</strong><br />
@@ -81,14 +90,14 @@
   </p>
 
   <p><strong>Reproducibility and provenance</strong><br />
-  All computed data are accompanied by metadata describing how values 
+  All computed data are accompanied by metadata describing how the values 
   were obtained, including algorithmic assumptions, software versions, 
   and references where applicable.
   </p>
 
   <p><strong>Forward-facing with room to grow</strong><br />
-  New invariants, frozen vertices, and skew-symmetrizable matrices will all 
-  need to be added eventually. The database will be built so that
+  New invariants, frozen vertices, and skew-symmetrizable matrices are 
+  objects of interest that should be included. The database will be built so that
   future expansion is a core design principle, not an afterthought.
   </p>
     
