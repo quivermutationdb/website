@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search — QMD</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J4QG6T5TE5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J4QG6T5TE5');
+  </script>
+
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<nav>
+  <a href="/" class="brand">QMD</a>
+  <a href="/about.html">About</a>
+  <a href="/browse.html">Browse</a>
+  <a href="/search.html" class="active">Search</a>
+  <a href="/roadmap.html">Roadmap</a>
+  <div class="spacer"></div>
+  <span class="status" id="api-status">connecting…</span>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Search</h1>
+    <p>Search quivers and mutation classes by combinatorial and algebraic properties.</p>
+  </div>
+
+  <div class="search-form">
+    <div class="form-title">Quick lookup by ID</div>
+    <div class="id-row">
+      <div class="input-group">
+        <label>Quiver ID or Mutation Class ID</label>
+        <input type="text" id="id-input" placeholder="Q.n4.abc… or MC.n4.abc…">
+      </div>
+      <button class="btn" onclick="lookupId()">Go →</button>
+    </div>
+
+    <div class="form-title">Filter quivers</div>
+    <div class="filter-grid">
+      <div class="field">
+        <label>Rank (vertices)</label>
+        <select id="f-rank">
+          <option value="">Any</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Dynkin type</label>
+        <input type="text" id="f-dynkin" placeholder="A3, D4, E6, …">
+      </div>
+      <div class="field">
+        <label>Max edge weight</label>
+        <select id="f-maxedge">
+          <option value="">Any</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Class type</label>
+        <select id="f-open">
+          <option value="">Any</option>
+          <option value="false">Finite type (closed)</option>
+          <option value="true">Open (unbounded)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Orbit size (labeled)</label>
+        <input type="number" id="f-orbit-min" placeholder="min">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <input type="number" id="f-orbit-max" placeholder="max">
+      </div>
+    </div>
+
+    <div class="check-group" style="margin-bottom:1.5rem">
+      <label>Properties</label>
+      <div class="checkboxes">
+        <label class="checkbox-pill"><input type="checkbox" id="f-acyclic"> acyclic</label>
+        <label class="checkbox-pill"><input type="checkbox" id="f-connected"> connected</label>
+        <label class="checkbox-pill"><input type="checkbox" id="f-simply-laced"> simply-laced</label>
+        <label class="checkbox-pill"><input type="checkbox" id="f-mutation-finite"> mutation-finite</label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" onclick="runSearch()">Search</button>
+      <button class="btn btn-ghost" onclick="resetSearch()">Reset</button>
+    </div>
+  </div>
+
+  <div id="results-area"></div>
+</div>
+
+<script>
+const API = 'https://api.quivermutationdb.org';
+
+function lookupId() {
+  const val = document.getElementById('id-input').value.trim();
+  if (!val) return;
+  if (val.startsWith('Q.')) {
+    location.href = `/quiver.html?id=${encodeURIComponent(val)}`;
+  } else if (val.startsWith('MC.')) {
+    location.href = `/class.html?id=${encodeURIComponent(val)}`;
+  } else {
+    alert('Please enter a valid Quiver ID (Q.n…) or Mutation Class ID (MC.n…)');
+  }
+}
+document.getElementById('id-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') lookupId();
+});
+
+function getFilters() {
+  const f = {};
+  const rank    = document.getElementById('f-rank').value;
+  const dynkin  = document.getElementById('f-dynkin').value.trim();
+  const maxedge = document.getElementById('f-maxedge').value;
+  const open    = document.getElementById('f-open').value;
+  const omin    = document.getElementById('f-orbit-min').value;
+  const omax    = document.getElementById('f-orbit-max').value;
+  const acyclic = document.getElementById('f-acyclic').checked;
+  const conn    = document.getElementById('f-connected').checked;
+  const laced   = document.getElementById('f-simply-laced').checked;
+  const mfin    = document.getElementById('f-mutation-finite').checked;
+
+  if (rank)    f.rank = rank;
+  if (dynkin)  f.dynkin_type = dynkin;
+  if (maxedge) f.max_edge = maxedge;
+  if (open)    f.is_open = open;
+  if (omin)    f.orbit_min = omin;
+  if (omax)    f.orbit_max = omax;
+  if (acyclic) f.is_acyclic = 'true';
+  if (conn)    f.is_connected = 'true';
+  if (laced)   f.is_simply_laced = 'true';
+  if (mfin)    f.is_mutation_finite = 'true';
+  return f;
+}
+
+function renderActivePills(filters) {
+  const labels = {
+    rank: 'rank', dynkin_type: 'dynkin', max_edge: 'max edge',
+    is_open: v => v === 'true' ? 'open' : 'finite type',
+    orbit_min: v => `orbit ≥ ${v}`, orbit_max: v => `orbit ≤ ${v}`,
+    is_acyclic: 'acyclic', is_connected: 'connected',
+    is_simply_laced: 'simply-laced', is_mutation_finite: 'mutation-finite',
+  };
+  return Object.entries(filters).map(([k, v]) => {
+    const label = typeof labels[k] === 'function' ? labels[k](v) : `${labels[k] ?? k}: ${v}`;
+    return `<span class="filter-pill">${label}<button onclick="removeFilter('${k}')">×</button></span>`;
+  }).join('');
+}
+
+let _lastFilters = {};
+
+function removeFilter(key) {
+  const resets = {
+    rank: () => document.getElementById('f-rank').value = '',
+    dynkin_type: () => document.getElementById('f-dynkin').value = '',
+    max_edge: () => document.getElementById('f-maxedge').value = '',
+    is_open: () => document.getElementById('f-open').value = '',
+    orbit_min: () => document.getElementById('f-orbit-min').value = '',
+    orbit_max: () => document.getElementById('f-orbit-max').value = '',
+    is_acyclic: () => document.getElementById('f-acyclic').checked = false,
+    is_connected: () => document.getElementById('f-connected').checked = false,
+    is_simply_laced: () => document.getElementById('f-simply-laced').checked = false,
+    is_mutation_finite: () => document.getElementById('f-mutation-finite').checked = false,
+  };
+  if (resets[key]) resets[key]();
+  runSearch();
+}
+
+async function runSearch() {
+  const filters = getFilters();
+  _lastFilters = filters;
+  const area = document.getElementById('results-area');
+
+  if (Object.keys(filters).length === 0) {
+    area.innerHTML = `<div class="state-msg">
+      <span class="mono-label">No filters applied</span>
+      Set at least one filter above, or <a href="/browse.html" style="color:var(--accent)">browse all quivers</a>.
+    </div>`;
+    return;
+  }
+
+  area.innerHTML = '<div class="state-msg"><div class="spinner"></div>Searching…</div>';
+
+  const params = new URLSearchParams({ limit: 100, ...filters });
+  let data;
+  try {
+    const res = await fetch(`${API}/search?${params}`);
+    if (!res.ok) throw new Error();
+    document.getElementById('api-status').textContent = 'connected';
+    data = await res.json();
+  } catch {
+    document.getElementById('api-status').textContent = 'demo mode';
+    // Demo results
+    data = demoSearch(filters);
+  }
+
+  renderResults(data, filters);
+}
+
+function demoSearch(filters) {
+  const rank = filters.rank ? parseInt(filters.rank) : null;
+  const items = [];
+  for (let i = 0; i < 12; i++) {
+    const n = rank ?? ((i % 4) + 1);
+    const isOpen = i % 4 === 0;
+    items.push({
+      qmd_id: `Q.n${n}.${(0xbeef00 + i * 0x3f1).toString(16).padEnd(16,'0')}`,
+      num_vertices: n,
+      dynkin_type: filters.dynkin_type || ['A3','D4','E6','—'][i % 4],
+      is_open: isOpen,
+      class_size: isOpen ? null : [2,14,50,132][n-1],
+      mc_id: `MC.n${n}.${(0xdead00 + i * 0x1c7).toString(16).padEnd(16,'0')}`,
+    });
+  }
+  return { items, total: items.length };
+}
+
+function renderResults(data, filters) {
+  const area = document.getElementById('results-area');
+  const pills = renderActivePills(filters);
+
+  if (!data.items || data.items.length === 0) {
+    area.innerHTML = `
+      ${pills ? `<div class="active-filters">${pills}</div>` : ''}
+      <div class="state-msg">
+        <span class="mono-label">No results</span>
+        No quivers match these filters.
+      </div>`;
+    return;
+  }
+
+  const rows = data.items.map(q => `
+    <tr>
+      <td><a href="/quiver.html?id=${encodeURIComponent(q.qmd_id)}">${q.qmd_id}</a></td>
+      <td class="mono">${q.num_vertices}</td>
+      <td class="mono">${q.dynkin_type ?? '—'}</td>
+      <td><span class="badge ${q.is_open ? 'badge-open' : 'badge-closed'}">${q.is_open ? 'Open' : 'Finite'}</span></td>
+      <td class="mono">${q.class_size ?? '∞'}</td>
+      <td><a href="/class.html?id=${encodeURIComponent(q.mc_id)}">${q.mc_id}</a></td>
+    </tr>
+  `).join('');
+
+  area.innerHTML = `
+    ${pills ? `<div class="active-filters">${pills}</div>` : ''}
+    <div class="results-header">
+      <span class="results-count">Found <b>${data.total.toLocaleString()}</b> quiver${data.total !== 1 ? 's' : ''}${data.total > 100 ? ' (showing first 100)' : ''}</span>
+      <a href="/browse.html" style="font-family:var(--mono);font-size:0.72rem;color:var(--accent);text-decoration:none">Browse all →</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Quiver ID</th>
+            <th>Rank</th>
+            <th>Dynkin type</th>
+            <th>Class</th>
+            <th>Orbit size</th>
+            <th>Mutation class</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function resetSearch() {
+  ['f-rank','f-dynkin','f-maxedge','f-open','f-orbit-min','f-orbit-max'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el.tagName === 'SELECT') el.value = '';
+    else el.value = '';
+  });
+  ['f-acyclic','f-connected','f-simply-laced','f-mutation-finite'].forEach(id => {
+    document.getElementById(id).checked = false;
+  });
+  document.getElementById('results-area').innerHTML = '';
+}
+
+// Auto-run from URL params if present
+const urlParams = new URLSearchParams(location.search);
+if ([...urlParams.keys()].some(k => k !== 'id')) {
+  // pre-populate form from URL and run
+  runSearch();
+}
+</script>
+<footer>
+  <span>Quiver Mutation Database (QMD)</span>
+  <span><a href="mailto:blake.jackson@uconn.edu">blake.jackson@uconn.edu</a></span>
+</footer>
+
+</body>
+</html>
