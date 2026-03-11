@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mutation Class — QMD</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-J4QG6T5TE5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-J4QG6T5TE5');
+  </script>
+
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<nav>
+  <a href="/" class="brand">QMD</a>
+  <a href="/about.html">About</a>
+  <a href="/browse.html">Browse</a>
+  <a href="/search.html">Search</a>
+  <a href="/roadmap.html">Roadmap</a>
+  <div class="spacer"></div>
+  <span class="status" id="api-status">connecting…</span>
+</nav>
+
+<div class="page" id="page-content">
+  <div class="state-msg"><div class="spinner"></div>Loading mutation class…</div>
+</div>
+
+<script>
+const API = 'https://api.quivermutationdb.org';
+const mcId = new URLSearchParams(location.search).get('id');
+let viewMode = 'table';
+
+function matrixMini(matrix) {
+  return matrix.map(row =>
+    `<div class="row">${row.map(v =>
+      `<span class="cell ${v>0?'positive':v<0?'negative':'zero'}">${v}</span>`
+    ).join('')}</div>`
+  ).join('');
+}
+
+function renderMatrix(matrix) {
+  const n = matrix.length;
+  const grid = document.createElement('div');
+  grid.className = 'matrix-grid';
+  grid.style.gridTemplateColumns = `repeat(${n}, auto)`;
+  matrix.forEach(row => row.forEach(val => {
+    const cell = document.createElement('div');
+    cell.className = 'matrix-cell ' + (val > 0 ? 'positive' : val < 0 ? 'negative' : 'zero');
+    cell.textContent = val;
+    grid.appendChild(cell);
+  }));
+  const wrap = document.createElement('div');
+  wrap.className = 'matrix-container';
+  const lb = document.createElement('span'); lb.className = 'matrix-bracket'; lb.textContent = '[';
+  const rb = document.createElement('span'); rb.className = 'matrix-bracket'; rb.textContent = ']';
+  wrap.appendChild(lb); wrap.appendChild(grid); wrap.appendChild(rb);
+  return wrap;
+}
+
+function renderOrbitTable(members, canonicalQid) {
+  const rows = members.map((m, i) => {
+    const isCanon = m.qmd_id === canonicalQid;
+    return `<tr class="${isCanon ? 'is-canon' : ''}">
+      <td class="mono">${i + 1}</td>
+      <td><a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>${isCanon ? ' <span class="canon-mark">canonical rep</span>' : ''}</td>
+      <td class="mono">${m.matrix ? m.matrix.flat().join(', ') : '—'}</td>
+    </tr>`;
+  }).join('');
+  return `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Quiver ID</th><th>Matrix (flat)</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderOrbitGrid(members, canonicalQid) {
+  const cards = members.map(m => {
+    const isCanon = m.qmd_id === canonicalQid;
+    const matrix = m.matrix ?? null;
+    return `<div class="matrix-card ${isCanon ? 'is-canon' : ''}" onclick="location.href='/quiver.html?id=${encodeURIComponent(m.qmd_id)}'">
+      <div class="matrix-card-id">
+        <a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>
+        ${isCanon ? '<br><span class="canon-mark">canonical rep</span>' : ''}
+      </div>
+      ${matrix ? `<div class="matrix-mini">${matrixMini(matrix)}</div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="matrix-grid-view">${cards}</div>`;
+}
+
+function setView(mode) {
+  viewMode = mode;
+  document.getElementById('btn-table').classList.toggle('active', mode === 'table');
+  document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+  const container = document.getElementById('orbit-container');
+  const members = window._members;
+  const canonId = window._canonId;
+  if (!members) return;
+  container.innerHTML = mode === 'table'
+    ? renderOrbitTable(members, canonId)
+    : renderOrbitGrid(members, canonId);
+}
+
+function renderPage(mc) {
+  document.title = `${mc.mc_id} — QMD`;
+  const isOpen = mc.is_open;
+  const n = mc.num_vertices;
+
+  const content = document.getElementById('page-content');
+  content.innerHTML = `
+    <div class="breadcrumb">
+      <a href="/browse.html">Browse</a>
+      <span>/</span>
+      <a href="/quiver.html?id=${encodeURIComponent(mc.canonical_qid)}">
+        ${mc.canonical_qid}
+      </a>
+      <span>/</span>
+      <span>${mc.mc_id}</span>
+    </div>
+
+    <div class="title-block">
+      <div class="qid">${mc.mc_id}</div>
+      <h1>${mc.label ?? ('Rank-' + n + ' Mutation Class')}</h1>
+      <div class="title-meta">
+        <span class="badge ${isOpen ? 'badge-open' : 'badge-closed'}">
+          ${isOpen ? 'Open' : 'Finite type'}
+        </span>
+        <span class="stat-pill">Labeled orbit: <b>${mc.labeled_size}</b> matrices</span>
+        <span class="stat-pill">Distinct quivers: <b>${mc.distinct_quiver_count}</b></span>
+        ${mc.merged_orbit_count > 1 ? `<span class="stat-pill">Merged from <b>${mc.merged_orbit_count}</b> BFS orbits</span>` : ''}
+      </div>
+    </div>
+
+    <div class="top-row">
+      <div class="section" id="canon-matrix-section">
+        <div class="section-label">Canonical representative (lex-min over all relabelings)</div>
+      </div>
+      <div class="section">
+        <div class="section-label">Class properties</div>
+        <div class="meta-list">
+          <div class="meta-row"><span class="key">Rank</span><span class="val">${n}</span></div>
+          <div class="meta-row"><span class="key">Dynkin type</span><span class="val">${mc.dynkin_type ?? '—'}</span></div>
+          <div class="meta-row"><span class="key">Labeled orbit size</span><span class="val">${mc.labeled_size}</span></div>
+          <div class="meta-row"><span class="key">Distinct unlabeled quivers</span><span class="val">${mc.distinct_quiver_count}</span></div>
+          <div class="meta-row"><span class="key">Is open</span><span class="val">${isOpen}</span></div>
+          <div class="meta-row"><span class="key">Canonical quiver</span>
+            <span class="val"><a href="/quiver.html?id=${encodeURIComponent(mc.canonical_qid)}">${mc.canonical_qid}</a></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="orbit-section">
+      <div class="orbit-header">
+        <div class="section-label" style="margin-bottom:0;border:none;padding:0">
+          Full labeled orbit — ${mc.labeled_size} matrices
+        </div>
+        <div class="orbit-controls">
+          <button class="view-btn active" id="btn-table" onclick="setView('table')">Table</button>
+          <button class="view-btn" id="btn-grid" onclick="setView('grid')">Grid</button>
+        </div>
+      </div>
+      <div id="orbit-container">
+        <div class="state-msg" style="padding:2rem"><div class="spinner"></div>Loading orbit…</div>
+      </div>
+    </div>
+  `;
+
+  // Insert canonical matrix
+  const canonSection = document.getElementById('canon-matrix-section');
+  canonSection.appendChild(renderMatrix(mc.canonical_matrix));
+
+  // Store members for view switching, then render
+  window._members = mc.labeled_quivers;
+  window._canonId = mc.canonical_qid;
+  setView('table');
+}
+
+async function fetchClass(id) {
+  try {
+    const res = await fetch(`${API}/classes/${encodeURIComponent(id)}`);
+    if (!res.ok) throw new Error();
+    document.getElementById('api-status').textContent = 'connected';
+    return await res.json();
+  } catch {
+    document.getElementById('api-status').textContent = 'demo mode';
+    // Demo A3 mutation class
+    const members = [
+      [[0,1,0],[-1,0,1],[0,-1,0]],
+      [[0,-1,0],[1,0,-1],[0,1,0]],
+      [[0,1,-1],[-1,0,0],[1,0,0]],
+      [[0,-1,1],[1,0,0],[-1,0,0]],
+      [[0,0,1],[0,0,1],[-1,-1,0]],
+      [[0,0,-1],[0,0,-1],[1,1,0]],
+      [[0,1,0],[-1,0,-1],[0,1,0]],
+      [[0,-1,0],[1,0,1],[0,-1,0]],
+      [[0,0,1],[0,0,-1],[-1,1,0]],
+      [[0,0,-1],[0,0,1],[1,-1,0]],
+      [[0,1,1],[-1,0,0],[-1,0,0]],
+      [[0,-1,-1],[1,0,0],[1,0,0]],
+      [[0,1,-1],[-1,0,1],[1,-1,0]],
+      [[0,-1,1],[1,0,-1],[-1,1,0]],
+    ].map((matrix, i) => ({
+      qmd_id: `Q.n3.${(0x8b4942 + i * 0x1f9a).toString(16).padEnd(16,'0')}`,
+      matrix,
+    }));
+    return {
+      mc_id: id,
+      label: 'A3',
+      num_vertices: 3,
+      dynkin_type: 'A3',
+      is_open: false,
+      labeled_size: 14,
+      distinct_quiver_count: 4,
+      merged_orbit_count: 1,
+      canonical_matrix: [[0,-1,-1],[1,0,0],[1,0,0]],
+      canonical_qid: members[11].qmd_id,
+      labeled_quivers: members,
+    };
+  }
+}
+
+if (!mcId) {
+  document.getElementById('page-content').innerHTML =
+    '<div class="state-msg">No class ID specified. <a href="/browse.html" style="color:var(--accent)">Browse all quivers →</a></div>';
+} else {
+  fetchClass(mcId).then(renderPage);
+}
+</script>
+<footer>
+  <span>Quiver Mutation Database (QMD)</span>
+  <span><a href="mailto:blake.jackson@uconn.edu">blake.jackson@uconn.edu</a></span>
+</footer>
+
+</body>
+</html>
