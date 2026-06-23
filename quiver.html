@@ -65,6 +65,14 @@ function renderPage(q) {
   const n = q.exchange_matrix.length;
   const isOpen = q.is_open;
   const dynkin = q.dynkin_type ?? '—';
+  const yn = v => v === true ? 'Yes' : v === false ? 'No'
+    : '<span style="color:var(--ink-light)">Unknown</span>';
+  const rep = q.representation_type
+    ? q.representation_type.charAt(0).toUpperCase() + q.representation_type.slice(1)
+    : '—';
+  const sym = q.symmetry_group
+    ? `${q.symmetry_group.name} <span style="color:var(--ink-light)">(order ${q.symmetry_group.order})</span>`
+    : '—';
 
   const content = document.getElementById('page-content');
   content.innerHTML = `
@@ -91,9 +99,14 @@ function renderPage(q) {
         <div class="meta-list">
           <div class="meta-row"><span class="key">Rank</span><span class="val">${n}</span></div>
           <div class="meta-row"><span class="key">Dynkin type</span><span class="val">${dynkin}</span></div>
-          <div class="meta-row"><span class="key">Acyclic</span><span class="val">${q.is_acyclic ?? '—'}</span></div>
-          <div class="meta-row"><span class="key">Connected</span><span class="val">${q.is_connected ?? '—'}</span></div>
+          <div class="meta-row" title="Representation type of the path algebra kQ (only defined for acyclic Q)"><span class="key">Representation type</span><span class="val">${rep}</span></div>
+          <div class="meta-row"><span class="key">Acyclic</span><span class="val">${yn(q.is_acyclic)}</span></div>
+          <div class="meta-row"><span class="key">Connected</span><span class="val">${yn(q.is_connected)}</span></div>
+          <div class="meta-row" title="Every vertex is a source or a sink"><span class="key">Bipartite</span><span class="val">${yn(q.is_bipartite)}</span></div>
+          <div class="meta-row" title="|b_ij| ≥ 2 for every pair of vertices"><span class="key">Abundant</span><span class="val">${yn(q.is_abundant)}</span></div>
+          <div class="meta-row" title="Underlying multigraph is planar"><span class="key">Planar</span><span class="val">${yn(q.is_planar)}</span></div>
           <div class="meta-row"><span class="key">Max edge weight</span><span class="val">${q.max_edge ?? '—'}</span></div>
+          <div class="meta-row" title="Automorphism group of the labeled quiver"><span class="key">Symmetry group</span><span class="val">${sym}</span></div>
           <div class="meta-row">
             <span class="key">Mutation class</span>
             <span class="val">
@@ -196,6 +209,11 @@ async function fetchQuiver(id) {
       is_open: false,
       is_acyclic: true,
       is_connected: true,
+      is_bipartite: true,
+      is_abundant: false,
+      is_planar: true,
+      representation_type: 'finite',
+      symmetry_group: { order: 2, name: 'Z/2', generators: [[2,1,0]] },
       max_edge: 1,
       class_size: 14,
       mc_id: 'MC.n3.8b4942ccbfd5b5aa',

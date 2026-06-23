@@ -36,6 +36,23 @@ const API = 'https://api.quivermutationdb.org';
 const mcId = new URLSearchParams(location.search).get('id');
 let viewMode = 'table';
 
+const yn = v => v === true ? 'Yes' : v === false ? 'No'
+  : '<span style="color:var(--ink-light)">Unknown</span>';
+
+function mutationType(mc) {
+  if (mc.is_finite_confirmed)   return 'Mutation-finite (proved)';
+  if (mc.is_infinite_confirmed) return 'Mutation-infinite (proved)';
+  if (mc.is_infinite_expected)  return 'Mutation-infinite (expected)';
+  return 'Unknown';
+}
+
+function provText(p) {
+  if (!p || !p.state) return '—';
+  if (p.state === 'true')  return 'Verified — witness recorded';
+  if (p.state === 'false') return 'Disproved — exhaustive search, no witness';
+  return 'Undetermined — semidecidable, search truncated';
+}
+
 function matrixMini(matrix) {
   return matrix.map(row =>
     `<div class="row">${row.map(v =>
@@ -148,13 +165,29 @@ function renderPage(mc) {
         <div class="meta-list">
           <div class="meta-row"><span class="key">Rank</span><span class="val">${n}</span></div>
           <div class="meta-row"><span class="key">Dynkin type</span><span class="val">${mc.dynkin_type ?? '—'}</span></div>
-          <div class="meta-row"><span class="key">Labeled orbit size</span><span class="val">${mc.labeled_size}</span></div>
+          <div class="meta-row"><span class="key">Mutation type</span><span class="val">${mutationType(mc)}</span></div>
+          <div class="meta-row"><span class="key">Labeled orbit size</span><span class="val">${mc.size_of_explored_mutation_class ?? mc.labeled_size}</span></div>
           <div class="meta-row"><span class="key">Distinct unlabeled quivers</span><span class="val">${mc.distinct_quiver_count}</span></div>
-          <div class="meta-row"><span class="key">Is open</span><span class="val">${isOpen}</span></div>
+          ${isOpen ? `<div class="meta-row" title="Explored quivers with a mutation leaving the bounded region"><span class="key">Explored frontier</span><span class="val">${mc.size_of_explored_frontier ?? '—'}</span></div>` : ''}
+          <div class="meta-row" title="Some quiver in the class is acyclic"><span class="key">Mutation-acyclic</span><span class="val">${yn(mc.is_mutation_acyclic)}</span></div>
+          <div class="meta-row" title="Banff ⟹ locally acyclic (Muller)"><span class="key">Locally acyclic</span><span class="val">${yn(mc.is_locally_acyclic)}</span></div>
+          <div class="meta-row"><span class="key">Banff</span><span class="val">${yn(mc.is_banff)}</span></div>
+          <div class="meta-row"><span class="key">Louise</span><span class="val">${yn(mc.is_louise)}</span></div>
+          <div class="meta-row"><span class="key">P′</span><span class="val">${yn(mc.is_p_prime)}</span></div>
           <div class="meta-row"><span class="key">Canonical quiver</span>
             <span class="val"><a href="/quiver.html?id=${encodeURIComponent(mc.canonical_qid)}">${mc.canonical_qid}</a></span>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Provenance — how the semidecidable properties were decided</div>
+      <div class="meta-list">
+        <div class="meta-row"><span class="key">Banff</span><span class="val">${provText((mc.provenance||{}).is_banff)}</span></div>
+        <div class="meta-row"><span class="key">Louise</span><span class="val">${provText((mc.provenance||{}).is_louise)}</span></div>
+        <div class="meta-row"><span class="key">P′</span><span class="val">${provText((mc.provenance||{}).is_p_prime)}</span></div>
+        ${(mc.provenance||{}).is_infinite_confirmed ? `<div class="meta-row"><span class="key">Mutation-infinite</span><span class="val">${(mc.provenance).is_infinite_confirmed.method}</span></div>` : ''}
       </div>
     </div>
 
@@ -221,6 +254,21 @@ async function fetchClass(id) {
       labeled_size: 14,
       distinct_quiver_count: 4,
       merged_orbit_count: 1,
+      is_finite_confirmed: true,
+      is_infinite_confirmed: false,
+      is_infinite_expected: false,
+      size_of_explored_mutation_class: 14,
+      size_of_explored_frontier: 0,
+      is_mutation_acyclic: true,
+      is_banff: true,
+      is_louise: true,
+      is_p_prime: true,
+      is_locally_acyclic: true,
+      provenance: {
+        is_banff: { state: 'true', witness: { condition: 'acyclic', mutations: [] } },
+        is_louise: { state: 'true', witness: { condition: 'acyclic', mutations: [] } },
+        is_p_prime: { state: 'true', witness: { condition: 'acyclic', mutations: [] } },
+      },
       canonical_matrix: [[0,-1,-1],[1,0,0],[1,0,0]],
       canonical_qid: members[11].qmd_id,
       labeled_quivers: members,

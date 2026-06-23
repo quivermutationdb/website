@@ -72,13 +72,14 @@
           <th data-col="qmd_id">Quiver ID <span class="sort-arrow">↕</span></th>
           <th data-col="num_vertices">Rank <span class="sort-arrow">↕</span></th>
           <th data-col="dynkin_type">Dynkin type <span class="sort-arrow">↕</span></th>
+          <th>Rep. type</th>
           <th data-col="class_type">Class <span class="sort-arrow">↕</span></th>
           <th data-col="class_size">Orbit size <span class="sort-arrow">↕</span></th>
           <th>Mutation class</th>
         </tr>
       </thead>
       <tbody id="table-body">
-        <tr><td colspan="6">
+        <tr><td colspan="7">
           <div class="state-msg">
             <div class="spinner"></div>
             Loading quivers…
@@ -139,6 +140,7 @@ function demoData(offset) {
       qmd_id: `Q.n${n}.${(0xdeadbeef + idx * 0x9e3779b9).toString(16).slice(0,16).padEnd(16,'0')}`,
       num_vertices: n,
       dynkin_type: isOpen ? null : dyn,
+      representation_type: isOpen ? 'wild' : ['finite','tame','wild'][idx % 3],
       is_open: isOpen,
       class_size: isOpen ? null : [2,14,50,132][n-1],
       mc_id: `MC.n${n}.${(0xcafebabe + idx * 0x6c62272e).toString(16).slice(0,16).padEnd(16,'0')}`,
@@ -153,7 +155,7 @@ function renderTable(data) {
   totalCount = data.total;
 
   if (!data.items || data.items.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6">
+    tbody.innerHTML = `<tr><td colspan="7">
       <div class="state-msg">
         <span class="mono-label">No results</span>
         No quivers match the current filters.
@@ -169,6 +171,7 @@ function renderTable(data) {
       <td><a href="/quiver.html?id=${encodeURIComponent(q.qmd_id)}">${q.qmd_id}</a></td>
       <td class="mono">${q.num_vertices}</td>
       <td class="mono">${q.dynkin_type ?? '<span style="color:var(--rule)">—</span>'}</td>
+      <td class="mono">${q.representation_type ? q.representation_type.charAt(0).toUpperCase() + q.representation_type.slice(1) : '<span style="color:var(--rule)">—</span>'}</td>
       <td>
         <span class="badge ${q.is_open ? 'badge-open' : 'badge-closed'}">
           ${q.is_open ? 'Open' : 'Finite'}

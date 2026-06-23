@@ -60,6 +60,15 @@
         <input type="text" id="f-dynkin" placeholder="A3, D4, E6, …">
       </div>
       <div class="field">
+        <label>Representation type</label>
+        <select id="f-reptype">
+          <option value="">Any</option>
+          <option value="finite">Finite</option>
+          <option value="tame">Tame</option>
+          <option value="wild">Wild</option>
+        </select>
+      </div>
+      <div class="field">
         <label>Max edge weight</label>
         <select id="f-maxedge">
           <option value="">Any</option>
@@ -126,6 +135,7 @@ function getFilters() {
   const f = {};
   const rank    = document.getElementById('f-rank').value;
   const dynkin  = document.getElementById('f-dynkin').value.trim();
+  const reptype = document.getElementById('f-reptype').value;
   const maxedge = document.getElementById('f-maxedge').value;
   const open    = document.getElementById('f-open').value;
   const omin    = document.getElementById('f-orbit-min').value;
@@ -137,6 +147,7 @@ function getFilters() {
 
   if (rank)    f.rank = rank;
   if (dynkin)  f.dynkin_type = dynkin;
+  if (reptype) f.representation_type = reptype;
   if (maxedge) f.max_edge = maxedge;
   if (open)    f.is_open = open;
   if (omin)    f.orbit_min = omin;
@@ -150,7 +161,7 @@ function getFilters() {
 
 function renderActivePills(filters) {
   const labels = {
-    rank: 'rank', dynkin_type: 'dynkin', max_edge: 'max edge',
+    rank: 'rank', dynkin_type: 'dynkin', representation_type: 'rep. type', max_edge: 'max edge',
     is_open: v => v === 'true' ? 'open' : 'finite type',
     orbit_min: v => `orbit ≥ ${v}`, orbit_max: v => `orbit ≤ ${v}`,
     is_acyclic: 'acyclic', is_connected: 'connected',
@@ -168,6 +179,7 @@ function removeFilter(key) {
   const resets = {
     rank: () => document.getElementById('f-rank').value = '',
     dynkin_type: () => document.getElementById('f-dynkin').value = '',
+    representation_type: () => document.getElementById('f-reptype').value = '',
     max_edge: () => document.getElementById('f-maxedge').value = '',
     is_open: () => document.getElementById('f-open').value = '',
     orbit_min: () => document.getElementById('f-orbit-min').value = '',
@@ -222,6 +234,7 @@ function demoSearch(filters) {
       qmd_id: `Q.n${n}.${(0xbeef00 + i * 0x3f1).toString(16).padEnd(16,'0')}`,
       num_vertices: n,
       dynkin_type: filters.dynkin_type || ['A3','D4','E6','—'][i % 4],
+      representation_type: filters.representation_type || ['finite','wild','tame','wild'][i % 4],
       is_open: isOpen,
       class_size: isOpen ? null : [2,14,50,132][n-1],
       mc_id: `MC.n${n}.${(0xdead00 + i * 0x1c7).toString(16).padEnd(16,'0')}`,
@@ -249,6 +262,7 @@ function renderResults(data, filters) {
       <td><a href="/quiver.html?id=${encodeURIComponent(q.qmd_id)}">${q.qmd_id}</a></td>
       <td class="mono">${q.num_vertices}</td>
       <td class="mono">${q.dynkin_type ?? '—'}</td>
+      <td class="mono">${q.representation_type ? q.representation_type.charAt(0).toUpperCase() + q.representation_type.slice(1) : '—'}</td>
       <td><span class="badge ${q.is_open ? 'badge-open' : 'badge-closed'}">${q.is_open ? 'Open' : 'Finite'}</span></td>
       <td class="mono">${q.class_size ?? '∞'}</td>
       <td><a href="/class.html?id=${encodeURIComponent(q.mc_id)}">${q.mc_id}</a></td>
@@ -268,6 +282,7 @@ function renderResults(data, filters) {
             <th>Quiver ID</th>
             <th>Rank</th>
             <th>Dynkin type</th>
+            <th>Rep. type</th>
             <th>Class</th>
             <th>Orbit size</th>
             <th>Mutation class</th>
@@ -279,7 +294,7 @@ function renderResults(data, filters) {
 }
 
 function resetSearch() {
-  ['f-rank','f-dynkin','f-maxedge','f-open','f-orbit-min','f-orbit-max'].forEach(id => {
+  ['f-rank','f-dynkin','f-reptype','f-maxedge','f-open','f-orbit-min','f-orbit-max'].forEach(id => {
     const el = document.getElementById(id);
     if (el.tagName === 'SELECT') el.value = '';
     else el.value = '';
