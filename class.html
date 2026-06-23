@@ -31,6 +31,7 @@
   <div class="state-msg"><div class="spinner"></div>Loading mutation class…</div>
 </div>
 
+<script src="/quiver-draw.js"></script>
 <script>
 const API = 'https://api.quivermutationdb.org';
 const mcId = new URLSearchParams(location.search).get('id');
@@ -53,14 +54,6 @@ function provText(p) {
   return 'Undetermined — semidecidable, search truncated';
 }
 
-function matrixMini(matrix) {
-  return matrix.map(row =>
-    `<div class="row">${row.map(v =>
-      `<span class="cell ${v>0?'positive':v<0?'negative':'zero'}">${v}</span>`
-    ).join('')}</div>`
-  ).join('');
-}
-
 function renderMatrix(matrix) {
   const n = matrix.length;
   const grid = document.createElement('div');
@@ -68,7 +61,7 @@ function renderMatrix(matrix) {
   grid.style.gridTemplateColumns = `repeat(${n}, auto)`;
   matrix.forEach(row => row.forEach(val => {
     const cell = document.createElement('div');
-    cell.className = 'matrix-cell ' + (val > 0 ? 'positive' : val < 0 ? 'negative' : 'zero');
+    cell.className = 'matrix-cell ' + (val > 0 ? 'pos' : val < 0 ? 'neg' : 'zero');
     cell.textContent = val;
     grid.appendChild(cell);
   }));
@@ -99,18 +92,27 @@ function renderOrbitTable(members, canonicalQid) {
 }
 
 function renderOrbitGrid(members, canonicalQid) {
-  const cards = members.map(m => {
+  const view = document.createElement('div');
+  view.className = 'matrix-grid-view';
+  members.forEach(m => {
     const isCanon = m.qmd_id === canonicalQid;
-    const matrix = m.matrix ?? null;
-    return `<div class="matrix-card ${isCanon ? 'is-canon' : ''}" onclick="location.href='/quiver.html?id=${encodeURIComponent(m.qmd_id)}'">
-      <div class="matrix-card-id">
-        <a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>
-        ${isCanon ? '<br><span class="canon-mark">canonical rep</span>' : ''}
-      </div>
-      ${matrix ? `<div class="matrix-mini">${matrixMini(matrix)}</div>` : ''}
-    </div>`;
-  }).join('');
-  return `<div class="matrix-grid-view">${cards}</div>`;
+    const card = document.createElement('div');
+    card.className = 'matrix-card' + (isCanon ? ' is-canon' : '');
+    card.onclick = () => { location.href = `/quiver.html?id=${encodeURIComponent(m.qmd_id)}`; };
+    const id = document.createElement('div');
+    id.className = 'matrix-card-id';
+    id.innerHTML = `<a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>`
+      + (isCanon ? '<br><span class="canon-mark">canonical rep</span>' : '');
+    card.appendChild(id);
+    if (m.matrix) {
+      const fig = document.createElement('div');
+      fig.className = 'quiver-figure';
+      fig.appendChild(renderQuiver(m.matrix, { mini: true }));
+      card.appendChild(fig);
+    }
+    view.appendChild(card);
+  });
+  return view;
 }
 
 function setView(mode) {
@@ -121,9 +123,12 @@ function setView(mode) {
   const members = window._members;
   const canonId = window._canonId;
   if (!members) return;
-  container.innerHTML = mode === 'table'
-    ? renderOrbitTable(members, canonId)
-    : renderOrbitGrid(members, canonId);
+  if (mode === 'table') {
+    container.innerHTML = renderOrbitTable(members, canonId);
+  } else {
+    container.innerHTML = '';
+    container.appendChild(renderOrbitGrid(members, canonId));
+  }
 }
 
 function renderPage(mc) {
@@ -207,9 +212,20 @@ function renderPage(mc) {
     </div>
   `;
 
-  // Insert canonical matrix
+  // Draw the canonical quiver; keep the exchange matrix in a collapsible
   const canonSection = document.getElementById('canon-matrix-section');
-  canonSection.appendChild(renderMatrix(mc.canonical_matrix));
+  const fig = document.createElement('div');
+  fig.className = 'quiver-figure';
+  fig.appendChild(renderQuiver(mc.canonical_matrix));
+  canonSection.appendChild(fig);
+
+  const details = document.createElement('details');
+  details.className = 'matrix-details';
+  const summary = document.createElement('summary');
+  summary.textContent = 'Exchange matrix';
+  details.appendChild(summary);
+  details.appendChild(renderMatrix(mc.canonical_matrix));
+  canonSection.appendChild(details);
 
   // Store members for view switching, then render
   window._members = mc.labeled_quivers;

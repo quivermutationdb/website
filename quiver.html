@@ -31,6 +31,7 @@
   <div class="state-msg"><div class="spinner"></div>Loading quiver…</div>
 </div>
 
+<script src="/quiver-draw.js"></script>
 <script>
 const API = 'https://api.quivermutationdb.org';
 const qid = new URLSearchParams(location.search).get('id');
@@ -42,18 +43,12 @@ function renderMatrix(matrix) {
   grid.style.gridTemplateColumns = `repeat(${n}, auto)`;
   matrix.forEach(row => row.forEach(val => {
     const cell = document.createElement('div');
-    cell.className = 'matrix-cell ' + (val > 0 ? 'positive' : val < 0 ? 'negative' : 'zero');
+    cell.className = 'matrix-cell ' + (val > 0 ? 'pos' : val < 0 ? 'neg' : 'zero');
     cell.textContent = val;
     grid.appendChild(cell);
   }));
   const wrap = document.createElement('div');
   wrap.className = 'matrix-container';
-  wrap.innerHTML = '<span class="matrix-bracket">[</span>';
-  wrap.appendChild(grid);
-  wrap.innerHTML += '<span class="matrix-bracket">]</span>';
-  wrap.querySelector('.matrix-grid') && wrap.insertBefore(grid, wrap.lastChild);
-  // rebuild properly
-  wrap.innerHTML = '';
   const lb = document.createElement('span'); lb.className = 'matrix-bracket'; lb.textContent = '[';
   const rb = document.createElement('span'); rb.className = 'matrix-bracket'; rb.textContent = ']';
   wrap.appendChild(lb); wrap.appendChild(grid); wrap.appendChild(rb);
@@ -91,8 +86,8 @@ function renderPage(q) {
     </div>
 
     <div class="two-col">
-      <div class="section" id="matrix-section">
-        <div class="section-label">Exchange matrix</div>
+      <div class="section" id="quiver-section">
+        <div class="section-label">Quiver</div>
       </div>
       <div class="section">
         <div class="section-label">Properties</div>
@@ -140,9 +135,20 @@ function renderPage(q) {
     </div>
   `;
 
-  // Insert the matrix
-  const matrixSection = document.getElementById('matrix-section');
-  matrixSection.appendChild(renderMatrix(q.exchange_matrix));
+  // Draw the quiver; keep the exchange matrix available in a collapsible
+  const quiverSection = document.getElementById('quiver-section');
+  const fig = document.createElement('div');
+  fig.className = 'quiver-figure';
+  fig.appendChild(renderQuiver(q.exchange_matrix));
+  quiverSection.appendChild(fig);
+
+  const details = document.createElement('details');
+  details.className = 'matrix-details';
+  const summary = document.createElement('summary');
+  summary.textContent = 'Exchange matrix';
+  details.appendChild(summary);
+  details.appendChild(renderMatrix(q.exchange_matrix));
+  quiverSection.appendChild(details);
 
   // Load class members
   fetchClassMembers(q.mc_id, q.qmd_id);
@@ -173,7 +179,7 @@ function renderClassMembers(members, currentQid, canonicalQid) {
   const rows = members.map(m => {
     const isCurrent = m.qmd_id === currentQid;
     const isCanon = m.qmd_id === canonicalQid;
-    return `<tr class="${isCanon ? 'canon-row' : ''}">
+    return `<tr class="${isCanon ? 'is-canon' : ''}">
       <td>${isCurrent
         ? `<span style="font-family:var(--mono);font-size:0.72rem">${m.qmd_id} <span style="color:var(--ink-light)">(current)</span></span>`
         : `<a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>`}
