@@ -688,6 +688,72 @@ th[data-col] { cursor: pointer; user-select: none; }
 th[data-col]:hover { color: var(--accent); }
 
 /* ============================================================
+   Download modal (shared by browse / search)
+   ============================================================ */
+.dl-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(30, 31, 20, 0.45);   /* olive-charcoal scrim */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.dl-overlay[hidden] { display: none; }
+.dl-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--rule-strong);
+  border-top: 3px solid var(--accent);
+  max-width: 430px;
+  width: 100%;
+}
+.dl-modal { padding: 1.5rem 1.75rem 1.75rem; }
+.dl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.dl-head h2 { border: none; margin: 0; padding: 0; font-size: 1.15rem; }
+.dl-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--ink-light);
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+.dl-close:hover { color: var(--accent); }
+.dl-sub { font-size: 0.9rem; color: var(--ink-light); margin-bottom: 1.25rem; }
+.dl-field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+.dl-field label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-light);
+}
+.dl-field .dl-opt { text-transform: none; letter-spacing: 0; font-style: italic; }
+.dl-field input {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--rule-strong);
+  background: var(--bg);
+  color: var(--ink);
+  outline: none;
+}
+.dl-field input:focus { border-color: var(--accent); }
+.dl-note { font-size: 0.78rem; color: var(--ink-light); font-style: italic; margin-bottom: 1.25rem; }
+.dl-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 480px) {
+  .dl-actions { flex-direction: column; }
+  .dl-actions .btn { width: 100%; }
+}
+
+/* ============================================================
    Accessibility
    ============================================================ */
 

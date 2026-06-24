@@ -59,6 +59,7 @@
     </div>
     <button class="btn" onclick="applyFilters()">Filter</button>
     <button class="btn btn-ghost" onclick="resetFilters()">Reset</button>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="openDownload()">Download ↓</button>
   </div>
 
   <div class="stats-row" id="stats-row" style="display:none">
@@ -93,6 +94,7 @@
   <div class="pagination" id="pagination"></div>
 </main>
 
+<script src="/download.js"></script>
 <script>
 const API = 'https://api.quivermutationdb.org';
 const PAGE_SIZE = 50;
@@ -219,6 +221,10 @@ async function goPage(p) {
   const data = await fetchQuivers(currentPage);
   renderTable(data);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openDownload() {
+  QMDDownload.open(filters, totalCount);
 }
 
 function applyFilters() {

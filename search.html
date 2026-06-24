@@ -108,12 +108,14 @@
     <div class="form-actions">
       <button class="btn" onclick="runSearch()">Search</button>
       <button class="btn btn-ghost" onclick="resetSearch()">Reset</button>
+      <button class="btn btn-ghost" style="margin-left:auto" onclick="openDownload()">Download ↓</button>
     </div>
   </div>
 
   <div id="results-area"></div>
 </main>
 
+<script src="/download.js"></script>
 <script>
 const API = 'https://api.quivermutationdb.org';
 
@@ -175,6 +177,15 @@ function renderActivePills(filters) {
 }
 
 let _lastFilters = {};
+let _lastTotal = null;
+
+// Download the current form's cut. Only attach a count when the form still
+// matches the last search that was actually run (otherwise it could mislead).
+function openDownload() {
+  const f = getFilters();
+  const same = JSON.stringify(f) === JSON.stringify(_lastFilters);
+  QMDDownload.open(f, same ? _lastTotal : null);
+}
 
 function removeFilter(key) {
   const resets = {
@@ -245,6 +256,7 @@ function demoSearch(filters) {
 }
 
 function renderResults(data, filters) {
+  _lastTotal = data.total;
   const area = document.getElementById('results-area');
   const pills = renderActivePills(filters);
 
