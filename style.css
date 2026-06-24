@@ -248,18 +248,17 @@ td a:hover { text-decoration: underline; }
 /* --- Matrix rendering --- */
 .matrix-container {
   display: flex;
-  align-items: center;
+  align-items: stretch;          /* brackets stretch to the matrix height */
   justify-content: center;
   padding: 1rem 0;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 .matrix-bracket {
-  font-size: 3rem;
-  color: var(--ink-light);
-  font-weight: 200;
-  line-height: 1;
-  font-family: 'Times New Roman', serif;
+  width: 0.45rem;
+  border: 1.5px solid var(--ink);
 }
+.matrix-bracket.left  { border-right: none; }
+.matrix-bracket.right { border-left: none; }
 .matrix-grid {
   display: grid;
   gap: 0;
@@ -269,13 +268,11 @@ td a:hover { text-decoration: underline; }
 .matrix-cell {
   padding: 0.4rem 0.75rem;
   text-align: right;
+  color: var(--ink);
   border: 1px solid transparent;
   transition: background 0.1s;
 }
-.matrix-cell:hover  { background: var(--accent-soft); }
-.matrix-cell.pos    { color: var(--accent); }
-.matrix-cell.neg    { color: #1a4f8b; }
-.matrix-cell.zero   { color: var(--rule); }
+.matrix-cell:hover { background: var(--accent-soft); }
 
 /* --- Meta list (key/value pairs) --- */
 .meta-list { display: flex; flex-direction: column; gap: 0.6rem; }

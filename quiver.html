@@ -49,8 +49,8 @@ function renderMatrix(matrix) {
   }));
   const wrap = document.createElement('div');
   wrap.className = 'matrix-container';
-  const lb = document.createElement('span'); lb.className = 'matrix-bracket'; lb.textContent = '[';
-  const rb = document.createElement('span'); rb.className = 'matrix-bracket'; rb.textContent = ']';
+  const lb = document.createElement('span'); lb.className = 'matrix-bracket left';
+  const rb = document.createElement('span'); rb.className = 'matrix-bracket right';
   wrap.appendChild(lb); wrap.appendChild(grid); wrap.appendChild(rb);
   return wrap;
 }
