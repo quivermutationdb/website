@@ -9,13 +9,13 @@
    pairs meet WCAG AA (>=4.5:1), most reach AAA (>=7:1). Arial throughout
    (a system font: no web-font load, consistent rendering). */
 :root {
-  --ink:         #1e1f14;   /* near-black olive-charcoal (not pure black) */
-  --ink-light:   #53552f;   /* secondary text: 6.99:1 on --bg */
+  --ink:         #1e1f14;   /* near-black olive-charcoal (reads as black) */
+  --ink-light:   #53552f;   /* secondary text: 7.4:1 on white */
   --rule:        #c8cbb0;   /* hairline borders (decorative) */
-  --rule-strong: #6c7048;   /* input/button borders: 4.7:1 on --bg (>=3) */
-  --bg:          #f3f4ea;   /* light olive-tinted (not pure white) */
-  --bg-card:     #fbfbf4;
-  --accent:      #4c5a1e;   /* dark olive: 6.8:1 on --bg, white 7.5:1 on it */
+  --rule-strong: #6c7048;   /* input/button borders: 5.0:1 on white (>=3) */
+  --bg:          #ffffff;   /* white page background */
+  --bg-card:     #f7f8f1;   /* faint olive-tinted card lift (reads near-white) */
+  --accent:      #4c5a1e;   /* dark olive: 7.2:1 on white, white 7.5:1 on it */
   --accent-soft: #e7ead3;
   --mono:        Arial, Helvetica, sans-serif;
   --serif:       Arial, Helvetica, sans-serif;
@@ -227,7 +227,7 @@ li { margin-bottom: 0.35rem; font-size: 1rem; }
   background: var(--bg-card);
 }
 table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-thead tr { border-bottom: 2px solid var(--rule); background: #f4f2ee; }
+thead tr { border-bottom: 2px solid var(--rule); background: #eef0e1; }
 th {
   font-family: var(--mono);
   font-size: 0.68rem;
@@ -382,7 +382,7 @@ td a { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); text-
   font-size: 0.7rem;
   padding: 0.2rem 0.6rem;
   background: var(--accent-soft);
-  border: 1px solid #d4aaaa;
+  border: 1px solid var(--rule-strong);
   color: var(--accent);
   display: flex;
   align-items: center;

@@ -36,7 +36,8 @@
 <script>
 const API = 'https://api.quivermutationdb.org';
 const mcId = new URLSearchParams(location.search).get('id');
-let viewMode = 'table';
+let membersMode = 'distinct';   // 'distinct' | 'all'
+let layoutMode = 'table';       // 'table' | 'grid'
 
 const yn = v => v === true ? 'Yes' : v === false ? 'No'
   : '<span style="color:var(--ink-light)">Unknown</span>';
@@ -74,36 +75,75 @@ function renderMatrix(matrix) {
   return wrap;
 }
 
-function renderOrbitTable(members, canonicalQid) {
-  const rows = members.map((m, i) => {
-    const isCanon = m.qmd_id === canonicalQid;
-    return `<tr class="${isCanon ? 'is-canon' : ''}">
+// Collapse the labeled orbit into one entry per distinct unlabeled quiver.
+// Used as a fallback when the API doesn't supply distinct_quivers (e.g. demo).
+function deriveDistinct(labeled, canonId) {
+  const map = new Map();
+  labeled.forEach(m => {
+    let g = map.get(m.qmd_id);
+    if (!g) {
+      g = { qmd_id: m.qmd_id, matrix: m.matrix,
+            labeling_count: 0, is_canonical: m.qmd_id === canonId };
+      map.set(m.qmd_id, g);
+    }
+    g.labeling_count++;
+  });
+  return [...map.values()].sort((a, b) =>
+    (b.is_canonical - a.is_canonical)
+    || (b.labeling_count - a.labeling_count)
+    || a.qmd_id.localeCompare(b.qmd_id));
+}
+
+// Canonical test depends on the active view:
+//   distinct    -> the one quiver flagged is_canonical
+//   labelings   -> the single matrix equal to the class canonical rep
+function isCanonical(m) {
+  if (membersMode === 'distinct') return !!m.is_canonical;
+  return JSON.stringify(m.matrix) === window._canonKey;
+}
+
+function currentList() {
+  return membersMode === 'distinct' ? window._distinct : window._labeled;
+}
+
+function renderMemberTable(list) {
+  const showCount = membersMode === 'distinct';
+  const head = showCount
+    ? '<tr><th>#</th><th>Quiver ID</th><th>Labelings</th><th>Matrix (flat)</th></tr>'
+    : '<tr><th>#</th><th>Quiver ID</th><th>Matrix (flat)</th></tr>';
+  const rows = list.map((m, i) => {
+    const canon = isCanonical(m);
+    const flat = m.matrix ? m.matrix.flat().join(', ') : '—';
+    return `<tr class="${canon ? 'is-canon' : ''}">
       <td class="mono">${i + 1}</td>
-      <td><a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>${isCanon ? ' <span class="canon-mark">canonical rep</span>' : ''}</td>
-      <td class="mono">${m.matrix ? m.matrix.flat().join(', ') : '—'}</td>
+      <td><a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>${canon ? ' <span class="canon-mark">canonical rep</span>' : ''}</td>
+      ${showCount ? `<td class="mono">${m.labeling_count}</td>` : ''}
+      <td class="mono">${flat}</td>
     </tr>`;
   }).join('');
   return `
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Quiver ID</th><th>Matrix (flat)</th></tr></thead>
+        <thead>${head}</thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
 }
 
-function renderOrbitGrid(members, canonicalQid) {
+function renderMemberGrid(list) {
   const view = document.createElement('div');
   view.className = 'matrix-grid-view';
-  members.forEach(m => {
-    const isCanon = m.qmd_id === canonicalQid;
+  list.forEach(m => {
+    const canon = isCanonical(m);
     const card = document.createElement('div');
-    card.className = 'matrix-card' + (isCanon ? ' is-canon' : '');
+    card.className = 'matrix-card' + (canon ? ' is-canon' : '');
     card.onclick = () => { location.href = `/quiver.html?id=${encodeURIComponent(m.qmd_id)}`; };
     const id = document.createElement('div');
     id.className = 'matrix-card-id';
     id.innerHTML = `<a href="/quiver.html?id=${encodeURIComponent(m.qmd_id)}">${m.qmd_id}</a>`
-      + (isCanon ? '<br><span class="canon-mark">canonical rep</span>' : '');
+      + (membersMode === 'distinct' && m.labeling_count
+          ? ` <span style="color:var(--ink-light)">×${m.labeling_count}</span>` : '')
+      + (canon ? '<br><span class="canon-mark">canonical rep</span>' : '');
     card.appendChild(id);
     if (m.matrix) {
       const fig = document.createElement('div');
@@ -116,20 +156,30 @@ function renderOrbitGrid(members, canonicalQid) {
   return view;
 }
 
-function setView(mode) {
-  viewMode = mode;
-  document.getElementById('btn-table').classList.toggle('active', mode === 'table');
-  document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+function renderMembers() {
   const container = document.getElementById('orbit-container');
-  const members = window._members;
-  const canonId = window._canonId;
-  if (!members) return;
-  if (mode === 'table') {
-    container.innerHTML = renderOrbitTable(members, canonId);
+  const list = currentList();
+  if (!list) return;
+  if (layoutMode === 'table') {
+    container.innerHTML = renderMemberTable(list);
   } else {
     container.innerHTML = '';
-    container.appendChild(renderOrbitGrid(members, canonId));
+    container.appendChild(renderMemberGrid(list));
   }
+}
+
+function setMode(mode) {
+  membersMode = mode;
+  document.getElementById('btn-distinct').classList.toggle('active', mode === 'distinct');
+  document.getElementById('btn-all').classList.toggle('active', mode === 'all');
+  renderMembers();
+}
+
+function setLayout(mode) {
+  layoutMode = mode;
+  document.getElementById('btn-table').classList.toggle('active', mode === 'table');
+  document.getElementById('btn-grid').classList.toggle('active', mode === 'grid');
+  renderMembers();
 }
 
 function renderPage(mc) {
@@ -200,15 +250,21 @@ function renderPage(mc) {
     <div class="orbit-section">
       <div class="orbit-header">
         <div class="section-label" style="margin-bottom:0;border:none;padding:0">
-          Full labeled orbit — ${mc.labeled_size} matrices
+          Members — ${mc.distinct_quivers ? mc.distinct_quivers.length : mc.distinct_quiver_count} distinct quivers · ${mc.labeled_size} labeled matrices
         </div>
-        <div class="orbit-controls">
-          <button class="view-btn active" id="btn-table" onclick="setView('table')">Table</button>
-          <button class="view-btn" id="btn-grid" onclick="setView('grid')">Grid</button>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <div class="orbit-controls" role="group" aria-label="Member set">
+            <button class="view-btn active" id="btn-distinct" onclick="setMode('distinct')">Distinct quivers</button>
+            <button class="view-btn" id="btn-all" onclick="setMode('all')">All labelings</button>
+          </div>
+          <div class="orbit-controls" role="group" aria-label="Layout">
+            <button class="view-btn active" id="btn-table" onclick="setLayout('table')">Table</button>
+            <button class="view-btn" id="btn-grid" onclick="setLayout('grid')">Grid</button>
+          </div>
         </div>
       </div>
       <div id="orbit-container">
-        <div class="state-msg" style="padding:2rem"><div class="spinner"></div>Loading orbit…</div>
+        <div class="state-msg" style="padding:2rem"><div class="spinner"></div>Loading members…</div>
       </div>
     </div>
   `;
@@ -228,10 +284,16 @@ function renderPage(mc) {
   details.appendChild(renderMatrix(mc.canonical_matrix));
   canonSection.appendChild(details);
 
-  // Store members for view switching, then render
-  window._members = mc.labeled_quivers;
+  // Store both member lists for view switching, then render.
+  window._labeled = mc.labeled_quivers || [];
+  window._distinct = (mc.distinct_quivers && mc.distinct_quivers.length)
+    ? mc.distinct_quivers
+    : deriveDistinct(window._labeled, mc.canonical_qid);
   window._canonId = mc.canonical_qid;
-  setView('table');
+  window._canonKey = JSON.stringify(mc.canonical_matrix);
+  membersMode = 'distinct';
+  layoutMode = 'table';
+  renderMembers();
 }
 
 async function fetchClass(id) {
