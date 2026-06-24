@@ -63,12 +63,18 @@ nav a {
   transition: color 0.15s, box-shadow 0.15s;
 }
 nav a:hover  { color: var(--accent); }
-/* Current page: accent + heavier weight + a bottom-bar tab indicator.
-   box-shadow (not border) so there's no layout shift. */
+/* Current page: a distinct boxed pill — accent border + soft-olive fill so
+   it's unmistakable against the white nav. Negative margin offsets the added
+   padding so neighbouring links don't shift. */
 nav a.active {
   color: var(--accent);
   font-weight: 600;
-  box-shadow: inset 0 -2px 0 var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  padding: 0.28rem 0.6rem;
+  margin: 0 -0.6rem;
+  align-self: center;
 }
 nav .spacer  { flex: 1; }
 nav .status {
