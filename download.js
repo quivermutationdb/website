@@ -14,7 +14,7 @@
   const API = 'https://api.quivermutationdb.org';
 
   let _filters = {};
-  let _count = null;
+  let _counts = { distinct: null, labelings: null };
 
   function activeFilters(f) {
     return Object.entries(f || {}).filter(([, v]) => v !== '' && v != null);
@@ -100,19 +100,31 @@
   function updateSub() {
     const n = activeFilters(_filters).length;
     const scope = selected('scope') || 'distinct';
-    const cntTxt = _count == null
-      ? 'quivers'
-      : `<b>${Number(_count).toLocaleString()}</b> quiver${_count === 1 ? '' : 's'}`;
+    const c = _counts[scope];
+    const noun = scope === 'labelings' ? 'labeled quiver' : 'quiver';
+    const cntTxt = (c == null)
+      ? (scope === 'labelings' ? 'labeled quivers' : 'quivers')
+      : `<b>${Number(c).toLocaleString()}</b> ${noun}${c === 1 ? '' : 's'}`;
     const cut = n === 0 ? 'the full dataset (no filters)' : 'your current filter cut';
-    const lead = scope === 'labelings'
-      ? `Exporting all labelings of ${cntTxt}`
-      : `Exporting ${cntTxt}`;
-    document.getElementById('dl-sub').innerHTML = `${lead} — ${cut}.`;
+    document.getElementById('dl-sub').innerHTML = `Exporting ${cntTxt} — ${cut}.`;
   }
 
-  function open(filters, count) {
+  // counts: a number (same for both) or { distinct, labelings }.
+  function open(filters, counts, initialScope) {
     _filters = filters || {};
-    _count = (count == null ? null : count);
+    if (counts == null) {
+      _counts = { distinct: null, labelings: null };
+    } else if (typeof counts === 'number') {
+      _counts = { distinct: counts, labelings: counts };
+    } else {
+      _counts = {
+        distinct:  counts.distinct  == null ? null : counts.distinct,
+        labelings: counts.labelings == null ? null : counts.labelings,
+      };
+    }
+    const scope = initialScope === 'labelings' ? 'labelings' : 'distinct';
+    document.querySelectorAll('.dl-seg[data-group="scope"] .seg').forEach(b =>
+      b.classList.toggle('active', b.dataset.val === scope));
     updateSub();
     document.getElementById('dl-overlay').hidden = false;
     document.getElementById('dl-email').focus();

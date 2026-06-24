@@ -181,13 +181,15 @@ function renderActivePills(filters) {
 
 let _lastFilters = {};
 let _lastTotal = null;
+let _lastLabeledTotal = null;
 
-// Download the current form's cut. Only attach a count when the form still
-// matches the last search that was actually run (otherwise it could mislead).
+// Download the current form's cut. Only attach counts when the form still
+// matches the last search that was actually run (otherwise they could mislead).
 function openDownload() {
   const f = getFilters();
   const same = JSON.stringify(f) === JSON.stringify(_lastFilters);
-  QMDDownload.open(f, same ? _lastTotal : null);
+  const counts = same ? { distinct: _lastTotal, labelings: _lastLabeledTotal } : null;
+  QMDDownload.open(f, counts, 'distinct');
 }
 
 function removeFilter(key) {
@@ -264,6 +266,7 @@ function demoSearch(filters) {
 
 function renderResults(data, filters) {
   _lastTotal = data.total;
+  _lastLabeledTotal = data.labeled_total ?? null;
   const area = document.getElementById('results-area');
   const pills = renderActivePills(filters);
 

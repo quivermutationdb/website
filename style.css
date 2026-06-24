@@ -435,6 +435,17 @@ td a { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); text-
 }
 .stats-row span b { color: var(--ink); font-weight: 500; }
 
+/* --- Browse controls (view toggle + stats) --- */
+.browse-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.browse-controls .stats-row { margin-bottom: 0; }
+
 /* --- Misc view toggle buttons --- */
 .view-btn {
   font-family: var(--mono);
