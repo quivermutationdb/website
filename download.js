@@ -5,9 +5,10 @@
      <script src="/download.js"></script>
      QMDDownload.open(filters, count)   // filters: same keys as /search
 
-   Opens a small modal that optionally collects an email / name, then
-   hands off to the API's /export endpoint (which streams CSV or Excel
-   and records the download server-side).
+   Opens a small modal that optionally collects an email / name and lets the
+   user pick a format (CSV / Excel) and contents (distinct quivers vs. all
+   labelings), then hands off to the API's /export endpoint (which streams the
+   file and records the download server-side).
    ============================================================ */
 (function () {
   const API = 'https://api.quivermutationdb.org';
@@ -19,8 +20,13 @@
     return Object.entries(f || {}).filter(([, v]) => v !== '' && v != null);
   }
 
-  function buildUrl(format) {
-    const params = new URLSearchParams({ format });
+  function selected(group) {
+    const el = document.querySelector(`.dl-seg[data-group="${group}"] .seg.active`);
+    return el ? el.dataset.val : null;
+  }
+
+  function buildUrl(format, scope) {
+    const params = new URLSearchParams({ format, scope });
     for (const [k, v] of activeFilters(_filters)) params.set(k, v);
     const email = document.getElementById('dl-email').value.trim();
     const name  = document.getElementById('dl-name').value.trim();
@@ -41,6 +47,7 @@
           <button class="dl-close" type="button" aria-label="Close" onclick="QMDDownload.close()">&times;</button>
         </div>
         <p class="dl-sub" id="dl-sub"></p>
+
         <div class="dl-field">
           <label for="dl-email">Email <span class="dl-opt">(optional)</span></label>
           <input type="email" id="dl-email" placeholder="you@university.edu" autocomplete="email">
@@ -49,29 +56,64 @@
           <label for="dl-name">Name / affiliation <span class="dl-opt">(optional)</span></label>
           <input type="text" id="dl-name" placeholder="Jane Doe, Some University" autocomplete="organization">
         </div>
+
+        <div class="dl-choice">
+          <span class="dl-choice-label">Contents</span>
+          <div class="dl-seg" data-group="scope">
+            <button type="button" class="seg active" data-val="distinct">Distinct quivers</button>
+            <button type="button" class="seg" data-val="labelings">All labelings</button>
+          </div>
+        </div>
+        <div class="dl-choice">
+          <span class="dl-choice-label">Format</span>
+          <div class="dl-seg" data-group="format">
+            <button type="button" class="seg active" data-val="csv">CSV</button>
+            <button type="button" class="seg" data-val="xlsx">Excel</button>
+          </div>
+        </div>
+
         <p class="dl-note">Email is optional — we use it only to understand who relies on the dataset.</p>
+
         <div class="dl-actions">
           <button class="btn btn-ghost" type="button" onclick="QMDDownload.close()">Cancel</button>
-          <button class="btn" type="button" onclick="QMDDownload.go('csv')">Download CSV</button>
-          <button class="btn" type="button" onclick="QMDDownload.go('xlsx')">Download Excel</button>
+          <button class="btn" type="button" onclick="QMDDownload.go()">Download</button>
         </div>
       </div>`;
     document.body.appendChild(el);
-    el.addEventListener('click', e => { if (e.target === el) close(); });
+
+    el.addEventListener('click', e => {
+      const seg = e.target.closest('.seg');
+      if (seg && el.contains(seg)) {
+        const group = seg.parentElement;
+        group.querySelectorAll('.seg').forEach(b => b.classList.remove('active'));
+        seg.classList.add('active');
+        if (group.dataset.group === 'scope') updateSub();
+        return;
+      }
+      if (e.target === el) close();
+    });
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && !el.hidden) close();
     });
   }
 
-  function open(filters, count) {
-    _filters = filters || {};
-    _count = (count == null ? null : count);
+  function updateSub() {
     const n = activeFilters(_filters).length;
+    const scope = selected('scope') || 'distinct';
     const cntTxt = _count == null
       ? 'quivers'
       : `<b>${Number(_count).toLocaleString()}</b> quiver${_count === 1 ? '' : 's'}`;
     const cut = n === 0 ? 'the full dataset (no filters)' : 'your current filter cut';
-    document.getElementById('dl-sub').innerHTML = `Exporting ${cntTxt} — ${cut}.`;
+    const lead = scope === 'labelings'
+      ? `Exporting all labelings of ${cntTxt}`
+      : `Exporting ${cntTxt}`;
+    document.getElementById('dl-sub').innerHTML = `${lead} — ${cut}.`;
+  }
+
+  function open(filters, count) {
+    _filters = filters || {};
+    _count = (count == null ? null : count);
+    updateSub();
     document.getElementById('dl-overlay').hidden = false;
     document.getElementById('dl-email').focus();
   }
@@ -81,11 +123,13 @@
     if (el) el.hidden = true;
   }
 
-  function go(format) {
+  function go() {
+    const format = selected('format') || 'csv';
+    const scope  = selected('scope')  || 'distinct';
     // Cross-origin attachment: the server's Content-Disposition supplies the
     // filename, so a plain link click downloads without navigating away.
     const a = document.createElement('a');
-    a.href = buildUrl(format);
+    a.href = buildUrl(format, scope);
     a.rel = 'noopener';
     document.body.appendChild(a);
     a.click();
@@ -93,6 +137,7 @@
     if (window.gtag) {
       gtag('event', 'download', {
         format,
+        scope,
         filtered: activeFilters(_filters).length > 0,
       });
     }

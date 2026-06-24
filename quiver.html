@@ -20,6 +20,7 @@
 
 <nav>
   <a href="/" class="brand">QMD</a>
+  <a href="/">Home</a>
   <a href="/about.html">About</a>
   <a href="/browse.html">Browse</a>
   <a href="/search.html">Search</a>
@@ -109,7 +110,7 @@ function renderPage(q) {
               <a href="/class.html?id=${encodeURIComponent(q.mc_id)}">${q.mc_id}</a>
             </span>
           </div>
-          <div class="meta-row"><span class="key">Orbit size</span><span class="val">${q.class_size ?? (isOpen ? '∞' : '—')}</span></div>
+          <div class="meta-row"><span class="key">Mutation class size</span><span class="val">${q.class_size ?? (isOpen ? '∞' : '—')}</span></div>
         </div>
       </div>
     </div>

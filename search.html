@@ -20,6 +20,7 @@
 
 <nav>
   <a href="/" class="brand">QMD</a>
+  <a href="/">Home</a>
   <a href="/about.html">About</a>
   <a href="/browse.html">Browse</a>
   <a href="/search.html" class="active">Search</a>
@@ -86,11 +87,11 @@
         </select>
       </div>
       <div class="field">
-        <label for="f-orbit-min">Orbit size (min)</label>
+        <label for="f-orbit-min">Mutation class size (min)</label>
         <input type="number" id="f-orbit-min" placeholder="min">
       </div>
       <div class="field">
-        <label for="f-orbit-max">Orbit size (max)</label>
+        <label for="f-orbit-max">Mutation class size (max)</label>
         <input type="number" id="f-orbit-max" placeholder="max">
       </div>
     </div>
@@ -108,7 +109,7 @@
     <div class="form-actions">
       <button class="btn" onclick="runSearch()">Search</button>
       <button class="btn btn-ghost" onclick="resetSearch()">Reset</button>
-      <button class="btn btn-ghost" style="margin-left:auto" onclick="openDownload()">Download ↓</button>
+      <button class="btn btn-ghost" onclick="openDownload()">Download ↓</button>
     </div>
   </div>
 
@@ -118,6 +119,8 @@
 <script src="/download.js"></script>
 <script>
 const API = 'https://api.quivermutationdb.org';
+const DASH = '<span style="color:var(--rule)">—</span>';
+const yncell = v => v === true ? 'Yes' : v === false ? 'No' : DASH;
 
 function lookupId() {
   const val = document.getElementById('id-input').value.trim();
@@ -166,7 +169,7 @@ function renderActivePills(filters) {
   const labels = {
     rank: 'rank', dynkin_type: 'dynkin', representation_type: 'rep. type', max_edge: 'max edge',
     is_open: v => v === 'true' ? 'open' : 'finite type',
-    orbit_min: v => `orbit ≥ ${v}`, orbit_max: v => `orbit ≤ ${v}`,
+    orbit_min: v => `class size ≥ ${v}`, orbit_max: v => `class size ≤ ${v}`,
     is_acyclic: 'acyclic', is_connected: 'connected',
     is_simply_laced: 'simply-laced', is_mutation_finite: 'mutation-finite',
   };
@@ -247,6 +250,10 @@ function demoSearch(filters) {
       num_vertices: n,
       dynkin_type: filters.dynkin_type || ['A3','D4','E6','—'][i % 4],
       representation_type: filters.representation_type || ['finite','wild','tame','wild'][i % 4],
+      max_edge: (i % 2) + 1,
+      is_acyclic: !isOpen,
+      is_connected: true,
+      is_bipartite: i % 2 === 0,
       is_open: isOpen,
       class_size: isOpen ? null : [2,14,50,132][n-1],
       mc_id: `MC.n${n}.${(0xdead00 + i * 0x1c7).toString(16).padEnd(16,'0')}`,
@@ -276,6 +283,10 @@ function renderResults(data, filters) {
       <td class="mono">${q.num_vertices}</td>
       <td class="mono">${q.dynkin_type ?? '—'}</td>
       <td class="mono">${q.representation_type ? q.representation_type.charAt(0).toUpperCase() + q.representation_type.slice(1) : '—'}</td>
+      <td class="mono">${q.max_edge ?? DASH}</td>
+      <td class="mono">${yncell(q.is_acyclic)}</td>
+      <td class="mono">${yncell(q.is_connected)}</td>
+      <td class="mono">${yncell(q.is_bipartite)}</td>
       <td><span class="badge ${q.is_open ? 'badge-open' : 'badge-closed'}">${q.is_open ? 'Open' : 'Finite'}</span></td>
       <td class="mono">${q.class_size ?? '∞'}</td>
       <td><a href="/class.html?id=${encodeURIComponent(q.mc_id)}">${q.mc_id}</a></td>
@@ -296,8 +307,12 @@ function renderResults(data, filters) {
             <th>Rank</th>
             <th>Dynkin type</th>
             <th>Rep. type</th>
+            <th>Max edge</th>
+            <th>Acyclic</th>
+            <th>Connected</th>
+            <th>Bipartite</th>
             <th>Class</th>
-            <th>Orbit size</th>
+            <th>Mutation class size</th>
             <th>Mutation class</th>
           </tr>
         </thead>

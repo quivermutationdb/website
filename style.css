@@ -746,10 +746,40 @@ th[data-col]:hover { color: var(--accent); }
   outline: none;
 }
 .dl-field input:focus { border-color: var(--accent); }
-.dl-note { font-size: 0.78rem; color: var(--ink-light); font-style: italic; margin-bottom: 1.25rem; }
-.dl-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: flex-end; }
+
+/* Format / contents choice rows (segmented controls) */
+.dl-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+.dl-choice-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-light);
+}
+.dl-seg { display: flex; gap: 0.4rem; }
+.dl-seg .seg {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--rule-strong);
+  background: var(--bg);
+  color: var(--ink-light);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.dl-seg .seg.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.dl-seg .seg:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+.dl-note { font-size: 0.78rem; color: var(--ink-light); font-style: italic; margin: 1.1rem 0 1.25rem; }
+.dl-actions { display: flex; gap: 0.6rem; justify-content: flex-end; }
 @media (max-width: 480px) {
-  .dl-actions { flex-direction: column; }
+  .dl-actions { flex-direction: column-reverse; }
   .dl-actions .btn { width: 100%; }
 }
 
