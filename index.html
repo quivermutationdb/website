@@ -63,32 +63,39 @@
       <div class="num">1&ndash;4</div>
       <div class="lbl">Ranks covered</div>
     </div>
-    <div class="stat-card">
-      <div class="num">Open</div>
-      <div class="lbl">Free &amp; downloadable</div>
-    </div>
   </div>
 
   <!-- Explore -->
   <h2 class="home-h">Start exploring</h2>
   <div class="action-grid">
     <button type="button" class="action-card" id="random-quiver">
-      <span class="ac-icon" aria-hidden="true">🎲</span>
+      <svg class="ac-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="6" cy="7" r="2.2"/><circle cx="18" cy="9" r="2.2"/><circle cx="11" cy="18" r="2.2"/>
+        <path d="M8 7.6l7.8 1.2M16.8 10.8l-4.2 5M9.6 16.2L7 9.1"/>
+      </svg>
       <span class="ac-title">Random quiver</span>
       <span class="ac-desc">Jump to a randomly chosen quiver and its invariants.</span>
     </button>
     <button type="button" class="action-card" id="random-class">
-      <span class="ac-icon" aria-hidden="true">🔀</span>
+      <svg class="ac-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 7h3.5l9.5 10H21M3 17h3.5l9.5-10H21"/>
+        <path d="M18 4l3 3-3 3M18 14l3 3-3 3"/>
+      </svg>
       <span class="ac-title">Random mutation class</span>
       <span class="ac-desc">Land on a random mutation-equivalence class.</span>
     </button>
     <a class="action-card" href="/browse.html">
-      <span class="ac-icon" aria-hidden="true">📚</span>
+      <svg class="ac-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 6h11M9 12h11M9 18h11"/>
+        <circle cx="4.5" cy="6" r="1.1"/><circle cx="4.5" cy="12" r="1.1"/><circle cx="4.5" cy="18" r="1.1"/>
+      </svg>
       <span class="ac-title">Browse the database</span>
       <span class="ac-desc">Page through every quiver, sortable and filterable.</span>
     </a>
     <a class="action-card" href="/search.html">
-      <span class="ac-icon" aria-hidden="true">🔍</span>
+      <svg class="ac-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5.2-5.2"/>
+      </svg>
       <span class="ac-title">Search &amp; filter</span>
       <span class="ac-desc">Find quivers by rank, Dynkin type, invariants, and more.</span>
     </a>
@@ -109,7 +116,7 @@
     </div>
 
     <!-- Did you know -->
-    <div class="card">
+    <div class="card card-flex">
       <div class="card-label">Did you know?</div>
       <p class="fact-text" id="fact-text"></p>
       <button type="button" class="fact-next" id="fact-next">Another fact →</button>
