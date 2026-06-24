@@ -25,6 +25,7 @@
   <a href="/browse.html">Browse</a>
   <a href="/search.html">Search</a>
   <a href="/roadmap.html">Roadmap</a>
+  <a href="/wiki.html">Wiki</a>
   <div class="spacer"></div>
   <span class="status" id="api-status">connecting…</span>
 </nav>
@@ -94,23 +95,23 @@ function renderPage(q) {
       <div class="section">
         <div class="section-label">Properties</div>
         <div class="meta-list">
-          <div class="meta-row"><span class="key">Rank</span><span class="val">${n}</span></div>
-          <div class="meta-row"><span class="key">Dynkin type</span><span class="val">${dynkin}</span></div>
-          <div class="meta-row" title="Representation type of the path algebra kQ (only defined for acyclic Q)"><span class="key">Representation type</span><span class="val">${rep}</span></div>
-          <div class="meta-row"><span class="key">Acyclic</span><span class="val">${yn(q.is_acyclic)}</span></div>
-          <div class="meta-row"><span class="key">Connected</span><span class="val">${yn(q.is_connected)}</span></div>
-          <div class="meta-row" title="Every vertex is a source or a sink"><span class="key">Bipartite</span><span class="val">${yn(q.is_bipartite)}</span></div>
-          <div class="meta-row" title="|b_ij| ≥ 2 for every pair of vertices"><span class="key">Abundant</span><span class="val">${yn(q.is_abundant)}</span></div>
-          <div class="meta-row" title="Underlying multigraph is planar"><span class="key">Planar</span><span class="val">${yn(q.is_planar)}</span></div>
-          <div class="meta-row"><span class="key">Max edge weight</span><span class="val">${q.max_edge ?? '—'}</span></div>
-          <div class="meta-row" title="Automorphism group of the labeled quiver"><span class="key">Symmetry group</span><span class="val">${sym}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#rank">Rank</a></span><span class="val">${n}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#dynkin-type">Dynkin type</a></span><span class="val">${dynkin}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#representation-type">Representation type</a></span><span class="val">${rep}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#acyclic">Acyclic</a></span><span class="val">${yn(q.is_acyclic)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#connected">Connected</a></span><span class="val">${yn(q.is_connected)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#bipartite">Bipartite</a></span><span class="val">${yn(q.is_bipartite)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#abundant">Abundant</a></span><span class="val">${yn(q.is_abundant)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#planar">Planar</a></span><span class="val">${yn(q.is_planar)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#max-edge">Max edge weight</a></span><span class="val">${q.max_edge ?? '—'}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#symmetry-group">Symmetry group</a></span><span class="val">${sym}</span></div>
           <div class="meta-row">
-            <span class="key">Mutation class</span>
+            <span class="key"><a class="def-link" href="/wiki.html#mutation-class">Mutation class</a></span>
             <span class="val">
               <a href="/class.html?id=${encodeURIComponent(q.mc_id)}">${q.mc_id}</a>
             </span>
           </div>
-          <div class="meta-row"><span class="key">Mutation class size</span><span class="val">${q.class_size ?? (isOpen ? '∞' : '—')}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#mutation-class-size">Mutation class size</a></span><span class="val">${q.class_size ?? (isOpen ? '∞' : '—')}</span></div>
         </div>
       </div>
     </div>

@@ -25,6 +25,7 @@
   <a href="/browse.html">Browse</a>
   <a href="/search.html" class="active">Search</a>
   <a href="/roadmap.html">Roadmap</a>
+  <a href="/wiki.html">Wiki</a>
   <div class="spacer"></div>
   <span class="status" id="api-status">connecting…</span>
 </nav>
@@ -306,17 +307,17 @@ function renderResults(data, filters) {
       <table>
         <thead>
           <tr>
-            <th>Quiver ID</th>
-            <th>Rank</th>
-            <th>Dynkin type</th>
-            <th>Rep. type</th>
-            <th>Max edge</th>
-            <th>Acyclic</th>
-            <th>Connected</th>
-            <th>Bipartite</th>
-            <th>Class</th>
-            <th>Mutation class size</th>
-            <th>Mutation class</th>
+            <th>Quiver ID <a class="col-info" href="/wiki.html#quiver-id" title="Definition" aria-label="Quiver ID definition">ⓘ</a></th>
+            <th>Rank <a class="col-info" href="/wiki.html#rank" title="Definition" aria-label="Rank definition">ⓘ</a></th>
+            <th>Dynkin type <a class="col-info" href="/wiki.html#dynkin-type" title="Definition" aria-label="Dynkin type definition">ⓘ</a></th>
+            <th>Rep. type <a class="col-info" href="/wiki.html#representation-type" title="Definition" aria-label="Representation type definition">ⓘ</a></th>
+            <th>Max edge <a class="col-info" href="/wiki.html#max-edge" title="Definition" aria-label="Max edge definition">ⓘ</a></th>
+            <th>Acyclic <a class="col-info" href="/wiki.html#acyclic" title="Definition" aria-label="Acyclic definition">ⓘ</a></th>
+            <th>Connected <a class="col-info" href="/wiki.html#connected" title="Definition" aria-label="Connected definition">ⓘ</a></th>
+            <th>Bipartite <a class="col-info" href="/wiki.html#bipartite" title="Definition" aria-label="Bipartite definition">ⓘ</a></th>
+            <th>Class <a class="col-info" href="/wiki.html#mutation-finite" title="Definition" aria-label="Class type definition">ⓘ</a></th>
+            <th>Mutation class size <a class="col-info" href="/wiki.html#mutation-class-size" title="Definition" aria-label="Mutation class size definition">ⓘ</a></th>
+            <th>Mutation class <a class="col-info" href="/wiki.html#mutation-class" title="Definition" aria-label="Mutation class definition">ⓘ</a></th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>

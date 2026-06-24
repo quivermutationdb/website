@@ -795,6 +795,122 @@ th[data-col]:hover { color: var(--accent); }
 }
 
 /* ============================================================
+   Wiki
+   ============================================================ */
+.wiki-layout {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+.wiki-toc {
+  position: sticky;
+  top: 68px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.82rem;
+  border-right: 1px solid var(--rule);
+  padding-right: 1rem;
+}
+.wiki-toc-group {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-light);
+  margin: 1rem 0 0.35rem;
+}
+.wiki-toc-group:first-child { margin-top: 0; }
+.wiki-toc a {
+  color: var(--ink-light);
+  text-decoration: none;
+  padding: 0.15rem 0;
+  border-left: 2px solid transparent;
+  padding-left: 0.6rem;
+  margin-left: -0.6rem;
+}
+.wiki-toc a:hover { color: var(--accent); border-left-color: var(--accent); }
+
+.wiki-content { max-width: 760px; min-width: 0; }
+.wiki-intro {
+  font-size: 1rem;
+  color: var(--ink);
+  border-left: 3px solid var(--accent);
+  background: var(--bg-card);
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+}
+.wiki-section { margin-bottom: 2.5rem; scroll-margin-top: 68px; }
+.wiki-section h2 {
+  margin-top: 0;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.4rem;
+}
+.wiki-formula {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+}
+.wiki-foot { font-size: 0.85rem; color: var(--ink-light); font-style: italic; margin-top: 3rem; }
+
+/* Code blocks — system monospace (no web-font load) for readability */
+.code-block {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  padding: 0.9rem 1.1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.code-block code {
+  font-family: ui-monospace, Menlo, Consolas, "Courier New", monospace;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--ink);
+  white-space: pre;
+}
+/* Inline code */
+code {
+  font-family: ui-monospace, Menlo, Consolas, "Courier New", monospace;
+  font-size: 0.86em;
+}
+
+@media (max-width: 820px) {
+  .wiki-layout { grid-template-columns: 1fr; }
+  .wiki-toc {
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    padding-right: 0;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* --- "Definition" deep-links (property labels -> wiki) --- */
+.def-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--rule-strong);
+}
+.def-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* --- Column-header info links (table headers -> wiki) --- */
+.col-info {
+  color: var(--rule-strong);
+  text-decoration: none;
+  font-style: normal;
+  font-weight: 400;
+  cursor: help;
+  margin-left: 0.2rem;
+}
+.col-info:hover { color: var(--accent); }
+
+/* ============================================================
    Accessibility
    ============================================================ */
 

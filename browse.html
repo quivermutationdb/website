@@ -25,6 +25,7 @@
   <a href="/browse.html" class="active">Browse</a>
   <a href="/search.html">Search</a>
   <a href="/roadmap.html">Roadmap</a>
+  <a href="/wiki.html">Wiki</a>
   <div class="spacer"></div>
   <span class="status" id="api-status">connecting…</span>
 </nav>
@@ -86,18 +87,18 @@
     <table id="quiver-table">
       <thead>
         <tr>
-          <th data-col="qmd_id">Quiver ID <span class="sort-arrow">↕</span></th>
-          <th data-col="num_vertices">Rank <span class="sort-arrow">↕</span></th>
-          <th data-col="dynkin_type">Dynkin type <span class="sort-arrow">↕</span></th>
-          <th>Rep. type</th>
-          <th data-col="max_edge">Max edge <span class="sort-arrow">↕</span></th>
-          <th>Acyclic</th>
-          <th>Connected</th>
-          <th>Bipartite</th>
-          <th data-col="class_type">Class <span class="sort-arrow">↕</span></th>
-          <th data-col="class_size">Mutation class size <span class="sort-arrow">↕</span></th>
-          <th>Mutation class</th>
-          <th>Matrix</th>
+          <th data-col="qmd_id">Quiver ID <a class="col-info" href="/wiki.html#quiver-id" title="Definition" aria-label="Quiver ID definition">ⓘ</a> <span class="sort-arrow">↕</span></th>
+          <th data-col="num_vertices">Rank <a class="col-info" href="/wiki.html#rank" title="Definition" aria-label="Rank definition">ⓘ</a> <span class="sort-arrow">↕</span></th>
+          <th data-col="dynkin_type">Dynkin type <a class="col-info" href="/wiki.html#dynkin-type" title="Definition" aria-label="Dynkin type definition">ⓘ</a> <span class="sort-arrow">↕</span></th>
+          <th>Rep. type <a class="col-info" href="/wiki.html#representation-type" title="Definition" aria-label="Representation type definition">ⓘ</a></th>
+          <th data-col="max_edge">Max edge <a class="col-info" href="/wiki.html#max-edge" title="Definition" aria-label="Max edge definition">ⓘ</a> <span class="sort-arrow">↕</span></th>
+          <th>Acyclic <a class="col-info" href="/wiki.html#acyclic" title="Definition" aria-label="Acyclic definition">ⓘ</a></th>
+          <th>Connected <a class="col-info" href="/wiki.html#connected" title="Definition" aria-label="Connected definition">ⓘ</a></th>
+          <th>Bipartite <a class="col-info" href="/wiki.html#bipartite" title="Definition" aria-label="Bipartite definition">ⓘ</a></th>
+          <th data-col="class_type">Class <a class="col-info" href="/wiki.html#mutation-finite" title="Definition" aria-label="Class type definition">ⓘ</a> <span class="sort-arrow">↕</span></th>
+          <th data-col="class_size">Mutation class size <a class="col-info" href="/wiki.html#mutation-class-size" title="Definition" aria-label="Mutation class size definition">ⓘ</a> <span class="sort-arrow">↕</span></th>
+          <th>Mutation class <a class="col-info" href="/wiki.html#mutation-class" title="Definition" aria-label="Mutation class definition">ⓘ</a></th>
+          <th>Matrix <a class="col-info" href="/wiki.html#quiver" title="Definition" aria-label="Exchange matrix definition">ⓘ</a></th>
         </tr>
       </thead>
       <tbody id="table-body">
@@ -303,7 +304,8 @@ function resetFilters() {
 
 // Sort on column header click
 document.querySelectorAll('th[data-col]').forEach(th => {
-  th.addEventListener('click', () => {
+  th.addEventListener('click', (e) => {
+    if (e.target.closest('.col-info')) return;   // wiki link, not a sort
     const col = th.dataset.col;
     if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
     else { sortCol = col; sortDir = 'asc'; }

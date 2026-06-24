@@ -25,6 +25,7 @@
   <a href="/browse.html">Browse</a>
   <a href="/search.html">Search</a>
   <a href="/roadmap.html">Roadmap</a>
+  <a href="/wiki.html">Wiki</a>
   <div class="spacer"></div>
   <span class="status" id="api-status">connecting…</span>
 </nav>
@@ -220,17 +221,17 @@ function renderPage(mc) {
       <div class="section">
         <div class="section-label">Class properties</div>
         <div class="meta-list">
-          <div class="meta-row"><span class="key">Rank</span><span class="val">${n}</span></div>
-          <div class="meta-row"><span class="key">Dynkin type</span><span class="val">${mc.dynkin_type ?? '—'}</span></div>
-          <div class="meta-row"><span class="key">Mutation type</span><span class="val">${mutationType(mc)}</span></div>
-          <div class="meta-row"><span class="key">Labeled orbit size</span><span class="val">${mc.size_of_explored_mutation_class ?? mc.labeled_size}</span></div>
-          <div class="meta-row"><span class="key">Distinct unlabeled quivers</span><span class="val">${mc.distinct_quiver_count}</span></div>
-          ${isOpen ? `<div class="meta-row" title="Explored quivers with a mutation leaving the bounded region"><span class="key">Explored frontier</span><span class="val">${mc.size_of_explored_frontier ?? '—'}</span></div>` : ''}
-          <div class="meta-row" title="Some quiver in the class is acyclic"><span class="key">Mutation-acyclic</span><span class="val">${yn(mc.is_mutation_acyclic)}</span></div>
-          <div class="meta-row"><span class="key">Banff</span><span class="val">${yn(mc.is_banff)}</span></div>
-          <div class="meta-row"><span class="key">Louise</span><span class="val">${yn(mc.is_louise)}</span></div>
-          <div class="meta-row"><span class="key">P′</span><span class="val">${yn(mc.is_p_prime)}</span></div>
-          <div class="meta-row"><span class="key">Canonical quiver</span>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#rank">Rank</a></span><span class="val">${n}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#dynkin-type">Dynkin type</a></span><span class="val">${mc.dynkin_type ?? '—'}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#mutation-finite">Mutation type</a></span><span class="val">${mutationType(mc)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#mutation-class-size">Labeled orbit size</a></span><span class="val">${mc.size_of_explored_mutation_class ?? mc.labeled_size}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#labeled-vs-distinct">Distinct unlabeled quivers</a></span><span class="val">${mc.distinct_quiver_count}</span></div>
+          ${isOpen ? `<div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#explored-frontier">Explored frontier</a></span><span class="val">${mc.size_of_explored_frontier ?? '—'}</span></div>` : ''}
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#mutation-acyclic">Mutation-acyclic</a></span><span class="val">${yn(mc.is_mutation_acyclic)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#banff">Banff</a></span><span class="val">${yn(mc.is_banff)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#louise">Louise</a></span><span class="val">${yn(mc.is_louise)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#p-prime">P′</a></span><span class="val">${yn(mc.is_p_prime)}</span></div>
+          <div class="meta-row"><span class="key"><a class="def-link" href="/wiki.html#quiver-id">Canonical quiver</a></span>
             <span class="val"><a href="/quiver.html?id=${encodeURIComponent(mc.canonical_qid)}">${mc.canonical_qid}</a></span>
           </div>
         </div>
