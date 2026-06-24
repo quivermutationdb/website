@@ -923,6 +923,141 @@ code {
 .col-info:hover { color: var(--accent); }
 
 /* ============================================================
+   Home page
+   ============================================================ */
+.hero-tag {
+  font-style: italic;
+  color: var(--ink-light);
+  font-size: 1.05rem;
+  max-width: 62ch;
+  margin-bottom: 1.5rem;
+}
+
+/* Live stat cards */
+.home-stats { display: flex; flex-wrap: wrap; gap: 1rem; margin: 2rem 0 1rem; }
+.stat-card {
+  flex: 1 1 170px;
+  border: 1px solid var(--rule);
+  background: var(--bg-card);
+  padding: 1.1rem 1.25rem;
+}
+.stat-card .num {
+  font-family: var(--mono);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.1;
+}
+.stat-card .lbl {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-light);
+  margin-top: 0.4rem;
+}
+
+/* Section heading for home blocks (no heavy rule like h2) */
+.home-h {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  margin: 2.75rem 0 1rem;
+}
+
+/* Action cards (Browse / Search / Random …) — links and buttons look alike */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--rule-strong);
+  background: var(--bg);
+  padding: 1.25rem;
+  font: inherit;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.action-card:hover { border-color: var(--accent); background: var(--accent-soft); }
+.action-card .ac-icon { font-size: 1.6rem; line-height: 1; }
+.action-card .ac-title { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.action-card .ac-desc  { font-size: 0.85rem; color: var(--ink-light); line-height: 1.5; }
+
+/* Featured quiver */
+.featured-quiver { text-align: center; }
+.featured-quiver .quiver-figure { margin: 0.25rem 0 0.75rem; }
+.featured-id {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-light);
+  word-break: break-all;
+  margin-bottom: 0.9rem;
+}
+.featured-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
+/* "Did you know" fact */
+.fact-text { font-size: 0.98rem; line-height: 1.6; margin-bottom: 1rem; min-height: 4.5em; }
+.fact-next {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.fact-next:hover { color: var(--ink); }
+
+/* Recent updates */
+.update-list { list-style: none; margin: 0; }
+.update-list li {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.92rem;
+}
+.update-list li:last-child { border-bottom: none; }
+.update-list .when {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-light);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+  min-width: 5.5rem;
+}
+
+/* How to cite */
+.cite-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+.copy-btn {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--rule-strong);
+  background: var(--bg);
+  color: var(--ink-light);
+  cursor: pointer;
+  transition: all 0.1s;
+  white-space: nowrap;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ============================================================
    Accessibility
    ============================================================ */
 
