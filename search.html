@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to main content</a>
 
 <nav>
   <a href="/" class="brand">QMD</a>
@@ -27,7 +28,7 @@
   <span class="status" id="api-status">connecting…</span>
 </nav>
 
-<div class="page">
+<main class="page" id="main">
   <div class="page-header">
     <h1>Search</h1>
     <p>Search quivers and mutation classes by combinatorial and algebraic properties.</p>
@@ -37,7 +38,7 @@
     <div class="form-title">Quick lookup by ID</div>
     <div class="id-row">
       <div class="input-group">
-        <label>Quiver ID or Mutation Class ID</label>
+        <label for="id-input">Quiver ID or Mutation Class ID</label>
         <input type="text" id="id-input" placeholder="Q.n4.abc… or MC.n4.abc…">
       </div>
       <button class="btn" onclick="lookupId()">Go →</button>
@@ -46,7 +47,7 @@
     <div class="form-title">Filter quivers</div>
     <div class="filter-grid">
       <div class="field">
-        <label>Rank (vertices)</label>
+        <label for="f-rank">Rank (vertices)</label>
         <select id="f-rank">
           <option value="">Any</option>
           <option value="1">1</option>
@@ -56,11 +57,11 @@
         </select>
       </div>
       <div class="field">
-        <label>Dynkin type</label>
+        <label for="f-dynkin">Dynkin type</label>
         <input type="text" id="f-dynkin" placeholder="A3, D4, E6, …">
       </div>
       <div class="field">
-        <label>Representation type</label>
+        <label for="f-reptype">Representation type</label>
         <select id="f-reptype">
           <option value="">Any</option>
           <option value="finite">Finite</option>
@@ -69,7 +70,7 @@
         </select>
       </div>
       <div class="field">
-        <label>Max edge weight</label>
+        <label for="f-maxedge">Max edge weight</label>
         <select id="f-maxedge">
           <option value="">Any</option>
           <option value="1">1</option>
@@ -77,7 +78,7 @@
         </select>
       </div>
       <div class="field">
-        <label>Class type</label>
+        <label for="f-open">Class type</label>
         <select id="f-open">
           <option value="">Any</option>
           <option value="false">Finite type (closed)</option>
@@ -85,11 +86,11 @@
         </select>
       </div>
       <div class="field">
-        <label>Orbit size (labeled)</label>
+        <label for="f-orbit-min">Orbit size (min)</label>
         <input type="number" id="f-orbit-min" placeholder="min">
       </div>
       <div class="field">
-        <label>&nbsp;</label>
+        <label for="f-orbit-max">Orbit size (max)</label>
         <input type="number" id="f-orbit-max" placeholder="max">
       </div>
     </div>
@@ -111,7 +112,7 @@
   </div>
 
   <div id="results-area"></div>
-</div>
+</main>
 
 <script>
 const API = 'https://api.quivermutationdb.org';

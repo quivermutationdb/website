@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to main content</a>
 
 <nav>
   <a href="/" class="brand">QMD</a>
@@ -27,7 +28,7 @@
   <span class="status" id="api-status">connecting…</span>
 </nav>
 
-<div class="page">
+<main class="page" id="main">
   <div class="page-header">
     <h1>Browse Quivers</h1>
     <p>All unlabeled quivers in the database, one record per isomorphism class.</p>
@@ -35,7 +36,7 @@
 
   <div class="filters">
     <div class="filter-group">
-      <label>Rank (vertices)</label>
+      <label for="filter-rank">Rank (vertices)</label>
       <select id="filter-rank">
         <option value="">All ranks</option>
         <option value="1">1</option>
@@ -45,7 +46,7 @@
       </select>
     </div>
     <div class="filter-group">
-      <label>Class type</label>
+      <label for="filter-open">Class type</label>
       <select id="filter-open">
         <option value="">All</option>
         <option value="false">Finite type (closed)</option>
@@ -53,7 +54,7 @@
       </select>
     </div>
     <div class="filter-group">
-      <label>Dynkin type</label>
+      <label for="filter-dynkin">Dynkin type</label>
       <input type="text" id="filter-dynkin" placeholder="e.g. A3, D4, E6">
     </div>
     <button class="btn" onclick="applyFilters()">Filter</button>
@@ -90,7 +91,7 @@
   </div>
 
   <div class="pagination" id="pagination"></div>
-</div>
+</main>
 
 <script>
 const API = 'https://api.quivermutationdb.org';
