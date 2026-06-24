@@ -227,7 +227,6 @@ function renderPage(mc) {
           <div class="meta-row"><span class="key">Distinct unlabeled quivers</span><span class="val">${mc.distinct_quiver_count}</span></div>
           ${isOpen ? `<div class="meta-row" title="Explored quivers with a mutation leaving the bounded region"><span class="key">Explored frontier</span><span class="val">${mc.size_of_explored_frontier ?? '—'}</span></div>` : ''}
           <div class="meta-row" title="Some quiver in the class is acyclic"><span class="key">Mutation-acyclic</span><span class="val">${yn(mc.is_mutation_acyclic)}</span></div>
-          <div class="meta-row" title="Banff ⟹ locally acyclic (Muller)"><span class="key">Locally acyclic</span><span class="val">${yn(mc.is_locally_acyclic)}</span></div>
           <div class="meta-row"><span class="key">Banff</span><span class="val">${yn(mc.is_banff)}</span></div>
           <div class="meta-row"><span class="key">Louise</span><span class="val">${yn(mc.is_louise)}</span></div>
           <div class="meta-row"><span class="key">P′</span><span class="val">${yn(mc.is_p_prime)}</span></div>
@@ -343,7 +342,6 @@ async function fetchClass(id) {
       is_banff: true,
       is_louise: true,
       is_p_prime: true,
-      is_locally_acyclic: true,
       provenance: {
         is_banff: { state: 'true', witness: { condition: 'acyclic', mutations: [] } },
         is_louise: { state: 'true', witness: { condition: 'acyclic', mutations: [] } },
