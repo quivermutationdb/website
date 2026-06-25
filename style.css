@@ -1067,6 +1067,23 @@ code {
 .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ============================================================
+   Acknowledgement page
+   ============================================================ */
+.ack-quote {
+  border-left: 3px solid var(--accent);
+  background: var(--bg-card);
+  padding: 0.9rem 1.25rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--ink);
+}
+.ack-note {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+  color: var(--ink-light);
+}
+
+/* ============================================================
    Accessibility
    ============================================================ */
 
